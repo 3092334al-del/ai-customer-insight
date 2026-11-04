@@ -24,7 +24,7 @@ body {
 .sidebar-note { padding: 16px 14px; border-radius: 15px; }
 .sidebar-note b { font-size: 13px; }
 .sidebar-note small { font-size: 12px; line-height: 1.5; }
-.team-card { gap: 12px; padding-top: 20px; }
+.team-card { gap: 12px; padding-top: 20px; margin-top: auto; }
 .avatar { width: 39px; height: 39px; font-size: 13px; }
 .team-card b { font-size: 13px; }
 .team-card small { font-size: 11px; }
