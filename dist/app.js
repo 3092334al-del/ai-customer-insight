@@ -37,7 +37,6 @@ function setData(data,label='загруженный файл'){
  $('#emptyBenefits').hidden=true;
  $('#formatGuide').hidden=true;
  $('#dataDashboard').hidden=false;
- $('#exportBtn').disabled=false;
  $('#analysisStatus').classList.remove('pending');
  $('#analysisStatus').lastChild.textContent=' Анализ завершён';
  renderAll(label);
@@ -51,7 +50,6 @@ function renderEmptyState(){
  $('#formatGuide').hidden=false;
  $('#dataDashboard').hidden=true;
  $('#reviewCountBadge').textContent='0';
- $('#exportBtn').disabled=true;
  $('#analysisStatus').classList.add('pending');
  $('#analysisStatus').lastChild.textContent=' Ожидаем данные';
  $('#reviewList').innerHTML='<div class="empty">Сначала загрузите CSV с отзывами на странице «Обзор».</div>';
@@ -73,7 +71,7 @@ function renderAll(label){
  $('#healthScore').textContent=Math.round(Math.max(0,Math.min(100,p*.7+(avg/5*100)*.3)));
 }
 
-function categoryStats(){return Object.keys(dictionaries.categories).map(name=>{const items=analysis.filter(r=>r.categories.includes(name));const neg=items.filter(r=>r.sentiment==='negative').length;return{name,count:items.length,negative:neg,rate:items.length?Math.round(neg/items.length*100):0}}).sort((a,b)=>b.count-a.count)}
+function categoryStats(){return Object.keys(dictionaries.categories).map(name=>{const items=analysis.filter(r=>r.categories.includes(name));const negative=items.filter(r=>r.sentiment==='negative').length;const positive=items.filter(r=>r.sentiment==='positive').length;return{name,count:items.length,negative,positive,rate:items.length?Math.round(negative/items.length*100):0,positiveRate:items.length?Math.round(positive/items.length*100):0}}).sort((a,b)=>b.count-a.count)}
 function renderCategories(){const max=Math.max(1,...categoryStats().map(x=>x.count));$('#categoryBars').innerHTML=categoryStats().map(x=>`<div class="bar-row"><div class="bar-label"><span>${x.name}</span><b>${x.count} · ${x.rate}% негатив</b></div><div class="track"><i style="width:${Math.round(x.count/max*100)}%"></i></div></div>`).join('')}
 
 function parseDate(raw){const p=String(raw).match(/(\d{1,2})[.\/-](\d{1,2})[.\/-](\d{2,4})/);if(!p)return null;const y=p[3].length===2?'20'+p[3]:p[3];return new Date(+y,+p[2]-1,+p[1])}
@@ -85,7 +83,16 @@ function renderReviews(){const q=($('#reviewSearch')?.value||'').toLowerCase();c
 
 function renderInsight(){const stats=categoryStats();const best=[...stats].sort((a,b)=>(b.count-b.negative)-(a.count-a.negative))[0];const worst=[...stats].sort((a,b)=>b.negative-a.negative)[0];if(!analysis.length)return;$('#mainInsightTitle').textContent=best&&best.count?`Сильная сторона — ${best.name.toLowerCase()}`:'Недостаточно данных для вывода';$('#mainInsightText').textContent=worst&&worst.negative?`При этом в категории «${worst.name}» найдено ${worst.negative} негативных ${plural(worst.negative,'сигнал','сигнала','сигналов')}. Начните улучшения с неё.`:'Критичных повторяющихся жалоб в выборке не обнаружено.'}
 
-function renderRecommendations(){const stats=categoryStats().sort((a,b)=>b.negative-a.negative);const copy={'Сервис':'Проверьте время ожидания и сценарии общения сотрудников. Введите короткий чек-лист смены.','Качество еды':'Разберите блюда, которые получают низкие оценки, и проверьте стабильность подачи.','Цена':'Сделайте ценность предложения понятнее: состав, размер порции и выгоду комплектов.','Атмосфера':'Проверьте чистоту, музыку, свет и плотность посадки в часы пик.'};$('#recommendations').innerHTML=stats.slice(0,3).map((x,i)=>`<article class="rec-card"><span>Шаг ${i+1}</span>${i===0&&x.negative?'<span class="priority">приоритет</span>':''}<h3>${x.negative?`Улучшить: ${x.name}`:`Поддерживать: ${x.name}`}</h3><p>${copy[x.name]} Основание: ${x.count} упоминаний, ${x.negative} негативных.</p></article>`).join('')}
+function renderRecommendations(){
+ const stats=categoryStats().filter(x=>x.count);
+ const strengthCopy={'Сервис':'Гости ценят работу команды. Закрепите удачные сценарии общения и используйте их при обучении новых сотрудников.','Качество еды':'Качество продукта формирует лояльность. Сохраните стандарты приготовления и регулярно проверяйте стабильность подачи.','Цена':'Гости видят ценность предложения. Подчёркивайте выгоду комплектов и сохраняйте прозрачность цен.','Атмосфера':'Обстановка помогает получать хорошие оценки. Сохраните удачные решения по чистоте, свету, музыке и комфорту.'};
+ const growthCopy={'Сервис':'Проверьте время ожидания и сценарии общения сотрудников. Введите короткий чек-лист смены.','Качество еды':'Разберите блюда, которые получают низкие оценки, и проверьте стабильность подачи.','Цена':'Сделайте ценность предложения понятнее: состав, размер порции и выгоду комплектов.','Атмосфера':'Проверьте чистоту, музыку, свет и плотность посадки в часы пик.'};
+ const strengths=[...stats].sort((a,b)=>b.positiveRate-a.positiveRate||b.positive-a.positive).slice(0,2);
+ const weaknesses=[...stats].sort((a,b)=>b.negative-a.negative||b.rate-a.rate).slice(0,2);
+ const strengthCards=strengths.map(x=>`<article class="rec-card strength-card"><span>${x.positiveRate}% позитивных</span><h3>${x.name}</h3><p>${strengthCopy[x.name]} Основание: ${x.positive} ${plural(x.positive,'положительный отзыв','положительных отзыва','положительных отзывов')} из ${x.count}.</p></article>`).join('');
+ const weaknessCards=weaknesses.map((x,i)=>`<article class="rec-card growth-card">${i===0&&x.negative?'<span class="priority">приоритет</span>':''}<span>${x.rate}% негативных</span><h3>${x.name}</h3><p>${growthCopy[x.name]} Основание: ${x.negative} ${plural(x.negative,'негативный сигнал','негативных сигнала','негативных сигналов')} из ${x.count}.</p></article>`).join('');
+ $('#recommendations').innerHTML=`<section class="rec-group strengths"><div class="rec-group-head"><i>+</i><div><p class="eyebrow">Сильные стороны</p><h2>Что особенно ценят гости</h2></div></div><div class="rec-stack">${strengthCards}</div></section><section class="rec-group weaknesses"><div class="rec-group-head"><i>!</i><div><p class="eyebrow">Зоны роста</p><h2>Что стоит улучшить</h2></div></div><div class="rec-stack">${weaknessCards}</div></section>`;
+}
 
 function parseCSV(text){
  const clean=text.replace(/^\uFEFF/,'');const first=(clean.split(/\r?\n/).find(Boolean)||'');const delimiter=(first.match(/;/g)||[]).length>=(first.match(/,/g)||[]).length?';':',';const rows=[];let row=[],cell='',quote=false;
@@ -94,11 +101,9 @@ function parseCSV(text){
 
 function handleFile(file){if(!file)return;if(!file.name.toLowerCase().endsWith('.csv'))return showToast('Нужен файл в формате CSV');if(file.size>5*1024*1024)return showToast('Файл больше 5 МБ');const reader=new FileReader();reader.onload=()=>{try{const data=parseCSV(reader.result);setData(data,file.name);$('#fileFeedback').textContent=`✓ ${file.name}: проанализировано ${data.length} ${plural(data.length,'отзыв','отзыва','отзывов')}`;showToast('Анализ завершён')}catch(e){showToast(e.message);$('#fileFeedback').textContent='Не удалось прочитать файл. Проверьте заголовки колонок.'}};reader.readAsText(file,'UTF-8')}
 
-function exportCSV(){if(!analysis.length)return showToast('Нет данных для экспорта');const head=['Имя','Дата','Оценка','Отзыв','Тональность','Категории'];const lines=analysis.map(r=>[r.name,r.date,r.rating,r.text,{positive:'позитив',neutral:'нейтрально',negative:'негатив'}[r.sentiment],r.categories.join(', ')].map(v=>`"${String(v).replace(/"/g,'""')}"`).join(';'));const blob=new Blob(['\uFEFF'+head.join(';')+'\n'+lines.join('\n')],{type:'text/csv;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`ai-customer-insight_${new Date().toISOString().slice(0,10)}.csv`;a.click();URL.revokeObjectURL(a.href);showToast('Отчёт скачан')}
-
 function switchView(name){$$('.view').forEach(v=>v.classList.remove('active'));$$('.nav-item').forEach(v=>v.classList.toggle('active',v.dataset.view===name));$(`#${name}View`).classList.add('active');$('#pageTitle').textContent={dashboard:'Обзор отзывов',reviews:'Все отзывы',insights:'Рекомендации',about:'О проекте'}[name];$('.sidebar').classList.remove('open');window.scrollTo({top:0,behavior:'smooth'})}
 let toastTimer;function showToast(text){const t=$('#toast');t.textContent=text;t.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),2600)}
 
-$$('.nav-item').forEach(b=>b.addEventListener('click',()=>switchView(b.dataset.view)));$$('[data-go]').forEach(b=>b.addEventListener('click',()=>switchView(b.dataset.go)));$('#mobileMenu').addEventListener('click',()=>$('.sidebar').classList.toggle('open'));$('#uploadBtn').addEventListener('click',()=>$('#fileInput').click());$('#emptyUploadBtn').addEventListener('click',()=>$('#fileInput').click());$('#fileInput').addEventListener('change',e=>handleFile(e.target.files[0]));$('#exportBtn').addEventListener('click',exportCSV);$('#reviewSearch').addEventListener('input',renderReviews);$('#sentimentFilter').addEventListener('change',renderReviews);
+$$('.nav-item').forEach(b=>b.addEventListener('click',()=>switchView(b.dataset.view)));$$('[data-go]').forEach(b=>b.addEventListener('click',()=>switchView(b.dataset.go)));$('#mobileMenu').addEventListener('click',()=>$('.sidebar').classList.toggle('open'));$('#uploadBtn').addEventListener('click',()=>$('#fileInput').click());$('#emptyUploadBtn').addEventListener('click',()=>$('#fileInput').click());$('#fileInput').addEventListener('change',e=>handleFile(e.target.files[0]));$('#reviewSearch').addEventListener('input',renderReviews);$('#sentimentFilter').addEventListener('change',renderReviews);
 const dz=$('#dropZone');['dragenter','dragover'].forEach(e=>dz.addEventListener(e,x=>{x.preventDefault();dz.classList.add('dragging')}));['dragleave','drop'].forEach(e=>dz.addEventListener(e,x=>{x.preventDefault();dz.classList.remove('dragging')}));dz.addEventListener('drop',e=>handleFile(e.dataTransfer.files[0]));
 renderEmptyState();
