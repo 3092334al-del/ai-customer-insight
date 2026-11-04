@@ -47,5 +47,21 @@
 .empty-benefits span { margin-bottom: 9px; color: var(--teal); font-size: 9px; font-weight: 900; }
 .empty-benefits b { font-size: 12px; }
 .empty-benefits p { margin: 5px 0 0; color: var(--muted); font-size: 9px; line-height: 1.45; }
+.format-guide { margin-top: 14px; padding: 26px; display: grid; grid-template-columns: .72fr 1.28fr; gap: 25px 34px; align-items: center; background: #102f33; color: #fff; border-radius: 18px; box-shadow: 0 16px 40px rgba(16,47,51,.11); }
+.format-copy h2 { margin: 3px 0 8px; font-size: 22px; }
+.format-copy > p:not(.eyebrow) { margin: 0; color: #a9c2c4; font-size: 11px; line-height: 1.55; }
+.format-copy .eyebrow { color: #78c9c2; }
+.format-columns { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; }
+.column { min-width: 0; padding: 13px; background: rgba(255,255,255,.055); border: 1px solid rgba(255,255,255,.08); border-radius: 11px; }
+.column span,.column b,.column small { display: block; }
+.column span { color: #799c9e; font-size: 7px; text-transform: uppercase; letter-spacing: .65px; }
+.column b { margin: 7px 0 3px; font-size: 13px; }
+.column small { color: #9eb5b7; font-size: 8px; line-height: 1.35; }
+.column.required { background: rgba(20,150,143,.16); border-color: rgba(73,193,184,.35); }
+.column.required span { color: #77d2ca; }
+.analysis-tags { grid-column: 1/-1; display: flex; align-items: center; gap: 7px; flex-wrap: wrap; padding-top: 3px; }
+.analysis-tags b { margin-right: 4px; color: #c7d9da; font-size: 9px; }
+.analysis-tags span { padding: 5px 8px; color: #a9c7c8; background: #1b4447; border-radius: 99px; font-size: 8px; }
 @media (max-width: 1000px) { .empty-dashboard { grid-template-columns: 1fr; } .preview-card { transform: none; } }
-@media (max-width: 600px) { .empty-dashboard { min-height: auto; padding: 25px 20px; gap: 25px; } .empty-intro { padding: 0; } .empty-intro h2 { font-size: 24px; } .empty-cta { align-items: flex-start; flex-direction: column; } .empty-steps { align-items: flex-start; gap: 10px; } .empty-steps i { display: none; } .empty-steps div { display: grid; justify-items: center; text-align: center; } .empty-benefits { grid-template-columns: 1fr; } }
+@media (max-width: 1000px) { .format-guide { grid-template-columns: 1fr; } }
+@media (max-width: 600px) { .empty-dashboard { min-height: auto; padding: 25px 20px; gap: 25px; } .empty-intro { padding: 0; } .empty-intro h2 { font-size: 24px; } .empty-cta { align-items: flex-start; flex-direction: column; } .empty-steps { align-items: flex-start; gap: 10px; } .empty-steps i { display: none; } .empty-steps div { display: grid; justify-items: center; text-align: center; } .empty-benefits { grid-template-columns: 1fr; } .format-columns { grid-template-columns: 1fr 1fr; } }

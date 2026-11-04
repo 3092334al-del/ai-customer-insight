@@ -55,7 +55,6 @@
             <div><b>Загрузите отзывы для нового анализа</b><p>CSV до 5 МБ · Яндекс Карты, 2ГИС или собственная выгрузка</p></div>
           </div>
           <div class="upload-actions">
-            <button class="button subtle" data-demo>Запустить демо</button>
             <button class="button primary" id="uploadBtn">Выбрать CSV</button>
             <input type="file" id="fileInput" accept=".csv,text/csv" hidden>
           </div>
@@ -67,10 +66,10 @@
             <div class="empty-orbit" aria-hidden="true"><span>+</span></div>
             <p class="eyebrow">Начало работы</p>
             <h2>Превратите отзывы в понятные решения</h2>
-            <p>Загрузите собственный CSV или запустите готовый тест на 25 вымышленных отзывах. Все вычисления выполняются прямо в браузере.</p>
+            <p>Загрузите собственный CSV с отзывами — система покажет тональность, ключевые темы, проблемные сигналы и рекомендации. Все вычисления выполняются прямо в браузере.</p>
             <div class="empty-cta">
-              <button class="button primary" data-demo>Посмотреть демо на 25 отзывах</button>
-              <span>Это займёт несколько секунд</span>
+              <button class="button primary" id="emptyUploadBtn">Загрузить отзывы</button>
+              <span>CSV до 5 МБ · данные не покидают устройство</span>
             </div>
             <div class="empty-steps">
               <div><b>1</b><span>Загрузка<br>одного CSV</span></div>
@@ -81,7 +80,7 @@
             </div>
           </section>
           <section class="preview-card" aria-label="Предпросмотр будущего дашборда">
-            <div class="preview-head"><div><small>ПРЕДПРОСМОТР</small><b>Что появится после анализа</b></div><span>DEMO</span></div>
+            <div class="preview-head"><div><small>ПРЕДПРОСМОТР</small><b>Что появится после анализа</b></div><span>ПРИМЕР</span></div>
             <div class="preview-kpis"><div><small>Тональность</small><strong>3 класса</strong></div><div><small>Категории</small><strong>4 аспекта</strong></div></div>
             <div class="preview-chart">
               <div class="preview-donut"><span>AI</span></div>
@@ -95,6 +94,20 @@
           <article><span>02</span><b>Без отправки данных</b><p>CSV обрабатывается локально и не загружается на сервер.</p></article>
           <article><span>03</span><b>С готовым выводом</b><p>Вместо таблицы — приоритетные жалобы и рекомендации.</p></article>
         </div>
+        <section class="format-guide" id="formatGuide">
+          <div class="format-copy">
+            <p class="eyebrow">Подготовка данных</p>
+            <h2>Какой CSV подойдёт</h2>
+            <p>Достаточно одной обязательной колонки с текстом. Остальные поля делают аналитику точнее и нагляднее.</p>
+          </div>
+          <div class="format-columns">
+            <div class="column required"><span>обязательно</span><b>Отзыв</b><small>текст сообщения гостя</small></div>
+            <div class="column"><span>необязательно</span><b>Оценка</b><small>число от 1 до 5</small></div>
+            <div class="column"><span>необязательно</span><b>Дата</b><small>для графика динамики</small></div>
+            <div class="column"><span>необязательно</span><b>Имя</b><small>для списка отзывов</small></div>
+          </div>
+          <div class="analysis-tags"><b>Система определит:</b><span>позитив</span><span>нейтрально</span><span>негатив</span><span>сервис</span><span>цена</span><span>качество еды</span><span>атмосфера</span></div>
+        </section>
 
         <div id="dataDashboard" hidden>
 

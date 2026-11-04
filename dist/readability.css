@@ -78,6 +78,17 @@ body {
 .empty-benefits span { font-size: 11px; }
 .empty-benefits b { font-size: 15px; }
 .empty-benefits p { margin-top: 7px; font-size: 12px; line-height: 1.55; }
+.format-guide { margin-top: 17px; padding: 31px; gap: 30px 40px; border-radius: 20px; }
+.format-copy h2 { font-size: 27px; }
+.format-copy > p:not(.eyebrow) { font-size: 13px; line-height: 1.6; }
+.format-columns { gap: 10px; }
+.column { padding: 16px; border-radius: 12px; }
+.column span { font-size: 9px; }
+.column b { margin-top: 8px; font-size: 16px; }
+.column small { font-size: 10px; }
+.analysis-tags { gap: 9px; }
+.analysis-tags b { font-size: 11px; }
+.analysis-tags span { padding: 6px 10px; font-size: 10px; }
 .kpi-grid { gap: 17px; margin: 11px 0 17px; }
 .kpi { padding: 21px; border-radius: 20px; box-shadow: 0 13px 35px rgba(18,43,47,.075); transition: transform .2s, box-shadow .2s; }
 .kpi:hover { transform: translateY(-2px); box-shadow: 0 18px 42px rgba(18,43,47,.11); }
