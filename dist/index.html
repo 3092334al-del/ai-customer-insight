@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="AI-Customer Insight — анализ тональности и тематики отзывов малого бизнеса.">
+  <title>AI-Customer Insight</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <a class="brand" href="#" aria-label="AI-Customer Insight — главная">
+        <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span><b>AI-Customer</b><small>Insight</small></span>
+      </a>
+
+      <nav class="nav" aria-label="Основная навигация">
+        <button class="nav-item active" data-view="dashboard"><span>⌁</span>Обзор</button>
+        <button class="nav-item" data-view="reviews"><span>☷</span>Отзывы <em id="reviewCountBadge">12</em></button>
+        <button class="nav-item" data-view="insights"><span>✦</span>Рекомендации</button>
+        <button class="nav-item" data-view="about"><span>◎</span>О проекте</button>
+      </nav>
+
+      <div class="sidebar-note">
+        <span class="pulse"></span>
+        <div><b>Прототип работает локально</b><small>Отзывы не отправляются на сервер</small></div>
+      </div>
+
+      <div class="team-card">
+        <div class="avatar">AИ</div>
+        <div><b>Команда проекта</b><small>Сириус.Лето · 2026</small></div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <button class="mobile-menu" id="mobileMenu" aria-label="Открыть меню">☰</button>
+        <div>
+          <p class="eyebrow">Панель владельца</p>
+          <h1 id="pageTitle">Обзор отзывов</h1>
+        </div>
+        <div class="top-actions">
+          <div class="status"><span></span> Анализ завершён</div>
+          <button class="button ghost" id="exportBtn">Скачать отчёт</button>
+        </div>
+      </header>
+
+      <section class="view active" id="dashboardView">
+        <div class="upload-card" id="dropZone">
+          <div class="upload-copy">
+            <span class="upload-icon">↥</span>
+            <div><b>Загрузите отзывы для нового анализа</b><p>CSV до 5 МБ · Яндекс Карты, 2ГИС или собственная выгрузка</p></div>
+          </div>
+          <div class="upload-actions">
+            <button class="button subtle" id="demoBtn">Вернуть демо</button>
+            <button class="button primary" id="uploadBtn">Выбрать CSV</button>
+            <input type="file" id="fileInput" accept=".csv,text/csv" hidden>
+          </div>
+        </div>
+        <div class="file-feedback" id="fileFeedback" role="status"></div>
+
+        <div class="kpi-grid">
+          <article class="kpi"><div class="kpi-head"><span>Всего отзывов</span><i class="cyan">☷</i></div><strong id="totalReviews">12</strong><small id="periodLabel">демонстрационный набор</small></article>
+          <article class="kpi"><div class="kpi-head"><span>Средняя оценка</span><i class="amber">★</i></div><strong id="avgRating">4,2</strong><small><b class="good" id="ratingDelta">выше 4 из 5</b></small></article>
+          <article class="kpi"><div class="kpi-head"><span>Позитивные</span><i class="green">↗</i></div><strong id="positiveShare">58%</strong><small><b class="good" id="positiveCount">7 отзывов</b></small></article>
+          <article class="kpi"><div class="kpi-head"><span>Требуют внимания</span><i class="coral">!</i></div><strong id="negativeCount">3</strong><small><b class="bad" id="negativeShare">25% выборки</b></small></article>
+        </div>
+
+        <div class="dashboard-grid">
+          <article class="panel sentiment-panel">
+            <div class="panel-title"><div><p class="eyebrow">Тональность</p><h2>Как гости оценивают бизнес</h2></div><span class="chip">вся выборка</span></div>
+            <div class="sentiment-content">
+              <div class="donut" id="sentimentDonut"><div><strong id="donutScore">58%</strong><span>позитив</span></div></div>
+              <div class="legend" id="sentimentLegend"></div>
+            </div>
+          </article>
+
+          <article class="panel categories-panel">
+            <div class="panel-title"><div><p class="eyebrow">Аспекты</p><h2>Что обсуждают чаще всего</h2></div><span class="chip">4 категории</span></div>
+            <div class="category-bars" id="categoryBars"></div>
+          </article>
+
+          <article class="panel dynamics-panel">
+            <div class="panel-title"><div><p class="eyebrow">Динамика</p><h2>Тональность по времени</h2></div><span class="chip">последние периоды</span></div>
+            <div class="chart-wrap">
+              <div class="chart-axis"><span>100%</span><span>75%</span><span>50%</span><span>25%</span><span>0%</span></div>
+              <div class="line-chart" id="lineChart" aria-label="График доли позитивных отзывов"></div>
+            </div>
+          </article>
+
+          <article class="panel insight-panel">
+            <div class="insight-mark">✦</div>
+            <p class="eyebrow">Главный сигнал</p>
+            <h2 id="mainInsightTitle">Гости чаще всего хвалят качество еды</h2>
+            <p id="mainInsightText">Но в негативных отзывах регулярно встречается ожидание заказа. Проверьте загрузку кухни в часы пик.</p>
+            <button class="text-button" data-go="insights">Все рекомендации <span>→</span></button>
+          </article>
+        </div>
+
+        <article class="panel complaints-panel">
+          <div class="panel-title"><div><p class="eyebrow">Приоритетные сигналы</p><h2>Отзывы, требующие внимания</h2></div><button class="text-button" data-go="reviews">Все отзывы →</button></div>
+          <div class="table-wrap"><table><thead><tr><th>Отзыв</th><th>Категория</th><th>Оценка</th><th>Тональность</th></tr></thead><tbody id="complaintsBody"></tbody></table></div>
+        </article>
+      </section>
+
+      <section class="view" id="reviewsView">
+        <div class="reviews-toolbar">
+          <div class="search"><span>⌕</span><input id="reviewSearch" placeholder="Поиск по тексту отзывов" aria-label="Поиск отзывов"></div>
+          <select id="sentimentFilter" aria-label="Фильтр тональности"><option value="all">Вся тональность</option><option value="positive">Позитивные</option><option value="neutral">Нейтральные</option><option value="negative">Негативные</option></select>
+        </div>
+        <div class="review-list" id="reviewList"></div>
+      </section>
+
+      <section class="view" id="insightsView">
+        <div class="recommendation-hero">
+          <div><p class="eyebrow">AI-рекомендации</p><h2>Из отзывов — в понятный план действий</h2><p>Приоритет рассчитывается по частоте упоминаний, тональности и оценке гостя.</p></div>
+          <div class="score-ring"><strong id="healthScore">74</strong><span>индекс<br>репутации</span></div>
+        </div>
+        <div class="recommendations" id="recommendations"></div>
+        <div class="method-note"><b>Как это работает в прототипе</b><p>Сайт нормализует CSV, определяет тональность по словарю и рейтингу, затем распределяет текст по аспектам. В следующей версии словарный алгоритм заменяется дообученной моделью ruBERT-tiny2.</p></div>
+      </section>
+
+      <section class="view" id="aboutView">
+        <div class="about-hero"><p class="eyebrow">Школьный проект · Сириус.Лето</p><h2>AI-Customer Insight</h2><p>Интеллектуальный анализатор отзывов для малого бизнеса. Помогает владельцу быстро увидеть повторяющиеся жалобы и сильные стороны без ручного разбора сотен сообщений.</p></div>
+        <div class="about-grid">
+          <article><span>01</span><h3>Загрузка</h3><p>Единый CSV из любой площадки. Поддерживаются разные названия колонок и разделители.</p></article>
+          <article><span>02</span><h3>Анализ</h3><p>Тональность: позитив, нейтрально, негатив. Аспекты: сервис, цена, качество еды, атмосфера.</p></article>
+          <article><span>03</span><h3>Решение</h3><p>Владелец получает дашборд, список приоритетных отзывов и практические рекомендации.</p></article>
+        </div>
+        <div class="roadmap"><h3>Развитие проекта</h3><div><b>Сейчас</b><span>Функциональный веб-прототип</span></div><div><b>Следующий этап</b><span>ruBERT-tiny2, F1-macro ≥ 0,75</span></div><div><b>Пилот</b><span>Тестирование с 10 владельцами бизнеса</span></div></div>
+      </section>
+    </main>
+  </div>
+  <div class="toast" id="toast" role="status"></div>
+  <script src="app.js"></script>
+</body>
+</html>
