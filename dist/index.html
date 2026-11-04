@@ -6,6 +6,7 @@
   <meta name="description" content="AI-Customer Insight — анализ тональности и тематики отзывов малого бизнеса.">
   <title>AI-Customer Insight</title>
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="empty-state.css">
 </head>
 <body>
   <div class="app-shell">
@@ -17,7 +18,7 @@
 
       <nav class="nav" aria-label="Основная навигация">
         <button class="nav-item active" data-view="dashboard"><span>⌁</span>Обзор</button>
-        <button class="nav-item" data-view="reviews"><span>☷</span>Отзывы <em id="reviewCountBadge">12</em></button>
+        <button class="nav-item" data-view="reviews"><span>☷</span>Отзывы <em id="reviewCountBadge">0</em></button>
         <button class="nav-item" data-view="insights"><span>✦</span>Рекомендации</button>
         <button class="nav-item" data-view="about"><span>◎</span>О проекте</button>
       </nav>
@@ -41,8 +42,8 @@
           <h1 id="pageTitle">Обзор отзывов</h1>
         </div>
         <div class="top-actions">
-          <div class="status"><span></span> Анализ завершён</div>
-          <button class="button ghost" id="exportBtn">Скачать отчёт</button>
+          <div class="status pending" id="analysisStatus"><span></span> Ожидаем данные</div>
+          <button class="button ghost" id="exportBtn" disabled>Скачать отчёт</button>
         </div>
       </header>
 
@@ -53,18 +54,34 @@
             <div><b>Загрузите отзывы для нового анализа</b><p>CSV до 5 МБ · Яндекс Карты, 2ГИС или собственная выгрузка</p></div>
           </div>
           <div class="upload-actions">
-            <button class="button subtle" id="demoBtn">Вернуть демо</button>
             <button class="button primary" id="uploadBtn">Выбрать CSV</button>
             <input type="file" id="fileInput" accept=".csv,text/csv" hidden>
           </div>
         </div>
         <div class="file-feedback" id="fileFeedback" role="status"></div>
 
+        <div class="empty-dashboard" id="emptyDashboard">
+          <div class="empty-orbit" aria-hidden="true"><span>+</span></div>
+          <p class="eyebrow">Начало работы</p>
+          <h2>Здесь появится анализ ваших отзывов</h2>
+          <p>Сейчас данных нет. Загрузите собственный CSV — после этого мы покажем тональность, категории, проблемные отзывы и рекомендации.</p>
+          <div class="empty-steps">
+            <div><b>1</b><span>Выгрузите отзывы<br>в формате CSV</span></div>
+            <i>→</i>
+            <div><b>2</b><span>Загрузите файл<br>в поле выше</span></div>
+            <i>→</i>
+            <div><b>3</b><span>Получите дашборд<br>и отчёт</span></div>
+          </div>
+          <a class="template-link" href="sample_reviews.csv" download>Скачать пустой шаблон CSV</a>
+        </div>
+
+        <div id="dataDashboard" hidden>
+
         <div class="kpi-grid">
-          <article class="kpi"><div class="kpi-head"><span>Всего отзывов</span><i class="cyan">☷</i></div><strong id="totalReviews">12</strong><small id="periodLabel">демонстрационный набор</small></article>
-          <article class="kpi"><div class="kpi-head"><span>Средняя оценка</span><i class="amber">★</i></div><strong id="avgRating">4,2</strong><small><b class="good" id="ratingDelta">выше 4 из 5</b></small></article>
-          <article class="kpi"><div class="kpi-head"><span>Позитивные</span><i class="green">↗</i></div><strong id="positiveShare">58%</strong><small><b class="good" id="positiveCount">7 отзывов</b></small></article>
-          <article class="kpi"><div class="kpi-head"><span>Требуют внимания</span><i class="coral">!</i></div><strong id="negativeCount">3</strong><small><b class="bad" id="negativeShare">25% выборки</b></small></article>
+          <article class="kpi"><div class="kpi-head"><span>Всего отзывов</span><i class="cyan">☷</i></div><strong id="totalReviews">0</strong><small id="periodLabel">данные не загружены</small></article>
+          <article class="kpi"><div class="kpi-head"><span>Средняя оценка</span><i class="amber">★</i></div><strong id="avgRating">—</strong><small><b class="good" id="ratingDelta">нет данных</b></small></article>
+          <article class="kpi"><div class="kpi-head"><span>Позитивные</span><i class="green">↗</i></div><strong id="positiveShare">0%</strong><small><b class="good" id="positiveCount">0 отзывов</b></small></article>
+          <article class="kpi"><div class="kpi-head"><span>Требуют внимания</span><i class="coral">!</i></div><strong id="negativeCount">0</strong><small><b class="bad" id="negativeShare">0% выборки</b></small></article>
         </div>
 
         <div class="dashboard-grid">
@@ -102,6 +119,7 @@
           <div class="panel-title"><div><p class="eyebrow">Приоритетные сигналы</p><h2>Отзывы, требующие внимания</h2></div><button class="text-button" data-go="reviews">Все отзывы →</button></div>
           <div class="table-wrap"><table><thead><tr><th>Отзыв</th><th>Категория</th><th>Оценка</th><th>Тональность</th></tr></thead><tbody id="complaintsBody"></tbody></table></div>
         </article>
+        </div>
       </section>
 
       <section class="view" id="reviewsView">
@@ -115,7 +133,7 @@
       <section class="view" id="insightsView">
         <div class="recommendation-hero">
           <div><p class="eyebrow">AI-рекомендации</p><h2>Из отзывов — в понятный план действий</h2><p>Приоритет рассчитывается по частоте упоминаний, тональности и оценке гостя.</p></div>
-          <div class="score-ring"><strong id="healthScore">74</strong><span>индекс<br>репутации</span></div>
+          <div class="score-ring"><strong id="healthScore">0</strong><span>индекс<br>репутации</span></div>
         </div>
         <div class="recommendations" id="recommendations"></div>
         <div class="method-note"><b>Как это работает в прототипе</b><p>Сайт нормализует CSV, определяет тональность по словарю и рейтингу, затем распределяет текст по аспектам. В следующей версии словарный алгоритм заменяется дообученной моделью ruBERT-tiny2.</p></div>

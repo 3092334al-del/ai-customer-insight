@@ -1,18 +1,3 @@
-const demoReviews=[
-{name:'Анна',date:'02.11.2026',rating:5,text:'Очень уютная атмосфера, вкусная паста и внимательный официант. Обязательно вернёмся!'},
-{name:'Михаил',date:'29.10.2026',rating:2,text:'Ждали заказ почти час. Официант не подходил, сервис разочаровал.'},
-{name:'Елена',date:'25.10.2026',rating:5,text:'Прекрасное место, еда свежая и очень вкусная. Цены адекватные.'},
-{name:'Игорь',date:'19.10.2026',rating:3,text:'В целом нормально, но порции маленькие за такую цену.'},
-{name:'София',date:'12.10.2026',rating:5,text:'Красивый интерьер, чисто и спокойно. Персонал вежливый.'},
-{name:'Алексей',date:'03.10.2026',rating:1,text:'Блюдо принесли холодным, пришлось долго ждать замену. Плохо.'},
-{name:'Мария',date:'23.09.2026',rating:4,text:'Хорошее кафе рядом с домом. Десерты вкусные, обслуживание быстрое.'},
-{name:'Роман',date:'12.09.2026',rating:5,text:'Лучший кофе в районе, бариста дружелюбный, цена приятная.'},
-{name:'Дарья',date:'30.08.2026',rating:4,text:'Стильный интерьер и приятная музыка. Немного тесно вечером.'},
-{name:'Павел',date:'14.08.2026',rating:2,text:'Слишком дорого для такого качества. Суп был невкусный.'},
-{name:'Ольга',date:'02.08.2026',rating:5,text:'Отличный завтрак, быстро приготовили, всё понравилось.'},
-{name:'Кирилл',date:'18.07.2026',rating:4,text:'Доброжелательные сотрудники и уютный зал. Вернусь ещё.'}
-];
-
 const dictionaries={
  positive:['отличн','вкусн','уютн','прекрасн','хорош','быстр','вежлив','приятн','свеж','лучший','понрав','доброжел','верн','адекватн','красив'],
  negative:['плох','долго','холодн','дорог','невкусн','разочар','час','маленьк','тесно','груб','гряз','ужас','медлен','ждать','ждали'],
@@ -46,9 +31,28 @@ function classify(review){
 
 function setData(data,label='загруженный файл'){
  reviews=data.filter(r=>r.text&&String(r.text).trim()).map((r,i)=>({name:r.name||`Гость ${i+1}`,date:r.date||'—',rating:Number(r.rating)||0,text:String(r.text).trim()}));
+ if(!reviews.length)throw new Error('В файле нет непустых отзывов');
  analysis=reviews.map(classify);
- localStorage.setItem('aci-last-data',JSON.stringify(reviews.slice(0,1000)));
+ $('#emptyDashboard').hidden=true;
+ $('#dataDashboard').hidden=false;
+ $('#exportBtn').disabled=false;
+ $('#analysisStatus').classList.remove('pending');
+ $('#analysisStatus').lastChild.textContent=' Анализ завершён';
  renderAll(label);
+}
+
+function renderEmptyState(){
+ reviews=[];analysis=[];
+ localStorage.removeItem('aci-last-data');
+ $('#emptyDashboard').hidden=false;
+ $('#dataDashboard').hidden=true;
+ $('#reviewCountBadge').textContent='0';
+ $('#exportBtn').disabled=true;
+ $('#analysisStatus').classList.add('pending');
+ $('#analysisStatus').lastChild.textContent=' Ожидаем данные';
+ $('#reviewList').innerHTML='<div class="empty">Сначала загрузите CSV с отзывами на странице «Обзор».</div>';
+ $('#recommendations').innerHTML='<div class="empty">Рекомендации появятся после загрузки и анализа отзывов.</div>';
+ $('#healthScore').textContent='0';
 }
 
 function renderAll(label){
@@ -91,6 +95,6 @@ function exportCSV(){if(!analysis.length)return showToast('Нет данных �
 function switchView(name){$$('.view').forEach(v=>v.classList.remove('active'));$$('.nav-item').forEach(v=>v.classList.toggle('active',v.dataset.view===name));$(`#${name}View`).classList.add('active');$('#pageTitle').textContent={dashboard:'Обзор отзывов',reviews:'Все отзывы',insights:'Рекомендации',about:'О проекте'}[name];$('.sidebar').classList.remove('open');window.scrollTo({top:0,behavior:'smooth'})}
 let toastTimer;function showToast(text){const t=$('#toast');t.textContent=text;t.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),2600)}
 
-$$('.nav-item').forEach(b=>b.addEventListener('click',()=>switchView(b.dataset.view)));$$('[data-go]').forEach(b=>b.addEventListener('click',()=>switchView(b.dataset.go)));$('#mobileMenu').addEventListener('click',()=>$('.sidebar').classList.toggle('open'));$('#uploadBtn').addEventListener('click',()=>$('#fileInput').click());$('#fileInput').addEventListener('change',e=>handleFile(e.target.files[0]));$('#demoBtn').addEventListener('click',()=>{setData(demoReviews,'демонстрационный набор');$('#fileFeedback').textContent='Демо-данные восстановлены';showToast('Демо-данные восстановлены')});$('#exportBtn').addEventListener('click',exportCSV);$('#reviewSearch').addEventListener('input',renderReviews);$('#sentimentFilter').addEventListener('change',renderReviews);
+$$('.nav-item').forEach(b=>b.addEventListener('click',()=>switchView(b.dataset.view)));$$('[data-go]').forEach(b=>b.addEventListener('click',()=>switchView(b.dataset.go)));$('#mobileMenu').addEventListener('click',()=>$('.sidebar').classList.toggle('open'));$('#uploadBtn').addEventListener('click',()=>$('#fileInput').click());$('#fileInput').addEventListener('change',e=>handleFile(e.target.files[0]));$('#exportBtn').addEventListener('click',exportCSV);$('#reviewSearch').addEventListener('input',renderReviews);$('#sentimentFilter').addEventListener('change',renderReviews);
 const dz=$('#dropZone');['dragenter','dragover'].forEach(e=>dz.addEventListener(e,x=>{x.preventDefault();dz.classList.add('dragging')}));['dragleave','drop'].forEach(e=>dz.addEventListener(e,x=>{x.preventDefault();dz.classList.remove('dragging')}));dz.addEventListener('drop',e=>handleFile(e.dataTransfer.files[0]));
-try{const saved=JSON.parse(localStorage.getItem('aci-last-data'));setData(Array.isArray(saved)&&saved.length?saved:demoReviews,Array.isArray(saved)&&saved.length?'последняя сохранённая выборка':'демонстрационный набор')}catch{setData(demoReviews,'демонстрационный набор')}
+renderEmptyState();

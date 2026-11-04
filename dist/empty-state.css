@@ -1,0 +1,35 @@
+.button:disabled { opacity: .45; cursor: not-allowed; transform: none; }
+.status.pending span { background: var(--amber); }
+.empty-dashboard {
+  min-height: 470px;
+  margin-top: 8px;
+  padding: 38px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background: #fff;
+  border: 1px solid #e4e9eb;
+  border-radius: 22px;
+  box-shadow: var(--shadow);
+}
+.empty-orbit { width: 86px; height: 86px; margin-bottom: 20px; display: grid; place-items: center; position: relative; border: 1px solid #b9d9d5; border-radius: 50%; }
+.empty-orbit::before, .empty-orbit::after { content: ""; position: absolute; border: 1px solid #d6e8e6; border-radius: 50%; transform: rotate(35deg); }
+.empty-orbit::before { width: 118px; height: 45px; }
+.empty-orbit::after { width: 45px; height: 118px; }
+.empty-orbit span { position: relative; z-index: 1; width: 42px; height: 42px; display: grid; place-items: center; color: #fff; background: var(--teal); border-radius: 50%; box-shadow: 0 8px 20px rgba(20,150,143,.25); font-size: 25px; font-weight: 300; }
+.empty-dashboard h2 { margin: 3px 0 9px; font-size: 24px; letter-spacing: -.7px; }
+.empty-dashboard > p:not(.eyebrow) { max-width: 600px; margin: 0; color: var(--muted); font-size: 12px; line-height: 1.65; }
+.empty-steps { display: flex; align-items: center; gap: 18px; margin: 27px 0 20px; }
+.empty-steps div { display: flex; align-items: center; gap: 9px; text-align: left; }
+.empty-steps b { width: 29px; height: 29px; display: grid; place-items: center; color: var(--teal-dark); background: #e4f2f0; border-radius: 9px; font-size: 11px; }
+.empty-steps span { color: #55616d; font-size: 10px; line-height: 1.45; }
+.empty-steps i { color: #a8b3ba; font-style: normal; }
+.template-link { padding-bottom: 2px; color: var(--teal-dark); border-bottom: 1px solid #9acbc6; font-size: 11px; font-weight: 800; text-decoration: none; }
+@media (max-width: 600px) {
+  .empty-dashboard { min-height: 430px; padding: 32px 18px; }
+  .empty-steps { align-items: flex-start; gap: 10px; }
+  .empty-steps i { display: none; }
+  .empty-steps div { display: grid; justify-items: center; text-align: center; }
+}
