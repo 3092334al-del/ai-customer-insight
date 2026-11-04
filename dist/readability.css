@@ -1,0 +1,167 @@
+/* Desktop readability pass: larger type, clearer hierarchy and roomier cards. */
+[hidden] { display: none !important; }
+body {
+  font-size: 16px;
+  line-height: 1.5;
+  background:
+    radial-gradient(circle at 76% 0%, rgba(20,150,143,.07), transparent 30rem),
+    linear-gradient(180deg, #f7f9fa 0%, #f1f5f5 100%);
+}
+.app-shell { grid-template-columns: 264px minmax(0,1fr); }
+.sidebar { padding: 32px 22px 22px; }
+.brand { gap: 14px; padding-bottom: 32px; }
+.brand-mark { width: 44px; height: 44px; border-radius: 14px; padding: 10px; }
+.brand-mark i { width: 5px; }
+.brand-mark i:nth-child(1) { height: 11px; }
+.brand-mark i:nth-child(2) { height: 21px; }
+.brand-mark i:nth-child(3) { height: 16px; }
+.brand b { font-size: 17px; }
+.brand small { margin-top: 1px; font-size: 13px; }
+.nav { gap: 9px; }
+.nav-item { padding: 14px 15px; border-radius: 13px; font-size: 15px; }
+.nav-item > span { width: 23px; font-size: 23px; }
+.nav-item em { padding: 3px 8px; font-size: 12px; }
+.sidebar-note { padding: 16px 14px; border-radius: 15px; }
+.sidebar-note b { font-size: 13px; }
+.sidebar-note small { font-size: 12px; line-height: 1.5; }
+.team-card { gap: 12px; padding-top: 20px; }
+.avatar { width: 39px; height: 39px; font-size: 13px; }
+.team-card b { font-size: 13px; }
+.team-card small { font-size: 11px; }
+.main { max-width: 1520px; padding: 0 40px 60px; }
+.topbar { height: 116px; }
+.eyebrow { margin-bottom: 7px; font-size: 11px; letter-spacing: 1.7px; }
+.topbar h1 { font-size: 31px; letter-spacing: -.9px; }
+.status { font-size: 13px; }
+.status span { width: 9px; height: 9px; }
+.button { padding: 12px 18px; border-radius: 11px; font-size: 13px; }
+.button.primary { box-shadow: 0 9px 22px rgba(20,150,143,.22); }
+.upload-card { padding: 19px 21px; border-radius: 16px; }
+.upload-copy { gap: 15px; }
+.upload-copy b { font-size: 15px; }
+.upload-copy p { margin-top: 5px; font-size: 12px; line-height: 1.45; }
+.upload-icon { width: 46px; height: 46px; border-radius: 13px; font-size: 27px; }
+.file-feedback { min-height: 25px; padding-top: 6px; font-size: 12px; }
+.empty-dashboard { min-height: 520px; padding: 42px; gap: 48px; border-radius: 26px; box-shadow: 0 22px 60px rgba(18,43,47,.09); }
+.empty-orbit { width: 82px; height: 82px; margin-bottom: 25px; }
+.empty-orbit::before { width: 114px; height: 44px; }
+.empty-orbit::after { width: 44px; height: 114px; }
+.empty-orbit span { width: 44px; height: 44px; font-size: 27px; }
+.empty-intro h2 { margin-bottom: 15px; font-size: clamp(32px,3vw,42px); line-height: 1.08; letter-spacing: -1.5px; }
+.empty-intro > p:not(.eyebrow) { max-width: 560px; font-size: 15px; line-height: 1.65; }
+.empty-cta { margin: 27px 0 31px; gap: 16px; }
+.empty-cta .button { font-size: 14px; }
+.empty-cta span { font-size: 11px; }
+.empty-steps { gap: 17px; }
+.empty-steps b { width: 34px; height: 34px; font-size: 12px; }
+.empty-steps span { font-size: 11px; line-height: 1.45; }
+.preview-card { padding: 24px; border-radius: 21px; }
+.preview-head small { font-size: 9px; }
+.preview-head b { font-size: 15px; }
+.preview-head > span { padding: 5px 8px; font-size: 9px; }
+.preview-kpis { gap: 10px; margin: 20px 0; }
+.preview-kpis div { padding: 14px; border-radius: 12px; }
+.preview-kpis small { font-size: 10px; }
+.preview-kpis strong { font-size: 17px; }
+.preview-chart { grid-template-columns: 105px 1fr; gap: 24px; padding: 19px; border-radius: 14px; }
+.preview-donut { width: 92px; height: 92px; }
+.preview-donut span { font-size: 16px; }
+.preview-bars { gap: 9px; }
+.preview-bars span { margin-bottom: 4px; font-size: 9px; }
+.preview-bars i { height: 7px; }
+.preview-signal { margin-top: 16px; padding: 14px; }
+.preview-signal > span { font-size: 19px; }
+.preview-signal small { font-size: 9px; }
+.preview-signal b { font-size: 11px; }
+.empty-benefits { gap: 15px; margin-top: 15px; }
+.empty-benefits article { padding: 20px 22px; border-radius: 16px; box-shadow: 0 9px 28px rgba(18,43,47,.045); }
+.empty-benefits span { font-size: 11px; }
+.empty-benefits b { font-size: 15px; }
+.empty-benefits p { margin-top: 7px; font-size: 12px; line-height: 1.55; }
+.kpi-grid { gap: 17px; margin: 11px 0 17px; }
+.kpi { padding: 21px; border-radius: 20px; box-shadow: 0 13px 35px rgba(18,43,47,.075); transition: transform .2s, box-shadow .2s; }
+.kpi:hover { transform: translateY(-2px); box-shadow: 0 18px 42px rgba(18,43,47,.11); }
+.kpi-head { font-size: 13px; }
+.kpi-head i { width: 34px; height: 34px; border-radius: 10px; font-size: 16px; }
+.kpi strong { margin: 14px 0 6px; font-size: 34px; }
+.kpi small { font-size: 12px; }
+.dashboard-grid { gap: 17px; }
+.panel { padding: 25px; border-radius: 20px; box-shadow: 0 13px 38px rgba(18,43,47,.07); }
+.panel-title { margin-bottom: 22px; }
+.panel h2 { font-size: 20px; line-height: 1.25; }
+.chip { padding: 6px 10px; font-size: 11px; }
+.sentiment-content { gap: 40px; padding: 8px 14px 12px; }
+.donut { width: 164px; height: 164px; }
+.donut strong { font-size: 31px; }
+.donut span { font-size: 11px; }
+.legend { gap: 15px; }
+.legend-row { grid-template-columns: 11px 1fr auto; gap: 10px; font-size: 13px; }
+.legend-row i { width: 10px; height: 10px; }
+.legend-row b { font-size: 15px; }
+.category-bars { gap: 17px; }
+.bar-row .bar-label { margin-bottom: 8px; font-size: 13px; }
+.bar-label b { font-size: 13px; }
+.track { height: 10px; }
+.dynamics-panel { min-height: 310px; }
+.chart-wrap { height: 210px; grid-template-columns: 42px 1fr; }
+.chart-axis { font-size: 11px; }
+.chart-column b { height: 25px; padding-top: 8px; font-size: 11px; }
+.insight-panel h2 { margin: 7px 0 13px; font-size: 25px; }
+.insight-panel > p:not(.eyebrow) { font-size: 14px; line-height: 1.65; }
+.insight-mark { font-size: 27px; }
+.text-button { font-size: 13px; }
+.complaints-panel { margin-top: 17px; }
+table { font-size: 13px; }
+th { padding: 0 12px 12px; font-size: 11px; }
+td { padding: 15px 12px; }
+.review-cell span { margin-top: 5px; font-size: 11px; }
+.tag,.sentiment-tag { padding: 6px 10px; font-size: 11px; }
+.reviews-toolbar { gap: 14px; margin-bottom: 19px; }
+.search input { height: 49px; font-size: 14px; }
+.reviews-toolbar select { padding: 0 17px; font-size: 13px; }
+.review-list { gap: 13px; }
+.review-card { padding: 21px 23px; border-radius: 17px; }
+.review-meta b { font-size: 14px; }
+.review-meta span { font-size: 12px; }
+.review-text { font-size: 14px; line-height: 1.65; }
+.recommendation-hero { padding: 33px 36px; border-radius: 23px; }
+.recommendation-hero h2 { font-size: 31px; }
+.recommendation-hero > div > p:last-child { font-size: 14px; }
+.score-ring { width: 125px; height: 125px; }
+.score-ring strong { font-size: 34px; }
+.score-ring span { font-size: 10px; }
+.recommendations { gap: 17px; margin-top: 17px; }
+.rec-card { padding: 25px; border-radius: 18px; }
+.rec-card > span,.priority { font-size: 10px!important; }
+.rec-card h3 { font-size: 18px; }
+.rec-card p { font-size: 13px; line-height: 1.65; }
+.method-note { margin-top: 17px; padding: 22px; }
+.method-note b { font-size: 14px; }
+.method-note p { font-size: 13px; }
+.about-hero { padding: 43px; border-radius: 23px; }
+.about-hero h2 { font-size: 44px; }
+.about-hero > p:last-child { font-size: 16px; }
+.about-grid { gap: 17px; margin-top: 17px; }
+.about-grid article { padding: 27px; border-radius: 18px; }
+.about-grid span { font-size: 13px; }
+.about-grid h3 { font-size: 20px; }
+.about-grid p { font-size: 13px; }
+.roadmap { margin-top: 17px; padding: 27px; }
+.roadmap div { padding: 14px 0; font-size: 13px; }
+.empty { padding: 45px; font-size: 14px; }
+@media (max-width: 1100px) {
+  .app-shell { grid-template-columns: 224px minmax(0,1fr); }
+  .main { padding: 0 24px 45px; }
+  .sidebar { padding-inline: 17px; }
+  .empty-dashboard { grid-template-columns: 1fr; }
+  .preview-card { transform: none; }
+}
+@media (max-width: 760px) {
+  body { font-size: 15px; }
+  .main { padding-inline: 16px; }
+  .topbar h1 { font-size: 25px; }
+  .empty-dashboard { min-height: auto; padding: 27px 21px; }
+  .empty-intro h2 { font-size: 30px; }
+  .empty-intro > p:not(.eyebrow) { font-size: 14px; }
+  .preview-chart { grid-template-columns: 90px 1fr; }
+}
