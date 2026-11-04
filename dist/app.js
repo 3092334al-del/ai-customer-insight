@@ -34,6 +34,7 @@ function setData(data,label='загруженный файл'){
  if(!reviews.length)throw new Error('В файле нет непустых отзывов');
  analysis=reviews.map(classify);
  $('#emptyDashboard').hidden=true;
+ $('#emptyBenefits').hidden=true;
  $('#dataDashboard').hidden=false;
  $('#exportBtn').disabled=false;
  $('#analysisStatus').classList.remove('pending');
@@ -45,6 +46,7 @@ function renderEmptyState(){
  reviews=[];analysis=[];
  localStorage.removeItem('aci-last-data');
  $('#emptyDashboard').hidden=false;
+ $('#emptyBenefits').hidden=false;
  $('#dataDashboard').hidden=true;
  $('#reviewCountBadge').textContent='0';
  $('#exportBtn').disabled=true;
@@ -90,11 +92,25 @@ function parseCSV(text){
 
 function handleFile(file){if(!file)return;if(!file.name.toLowerCase().endsWith('.csv'))return showToast('Нужен файл в формате CSV');if(file.size>5*1024*1024)return showToast('Файл больше 5 МБ');const reader=new FileReader();reader.onload=()=>{try{const data=parseCSV(reader.result);setData(data,file.name);$('#fileFeedback').textContent=`✓ ${file.name}: проанализировано ${data.length} ${plural(data.length,'отзыв','отзыва','отзывов')}`;showToast('Анализ завершён')}catch(e){showToast(e.message);$('#fileFeedback').textContent='Не удалось прочитать файл. Проверьте заголовки колонок.'}};reader.readAsText(file,'UTF-8')}
 
+async function loadDemo(){
+ const buttons=$$('[data-demo]');buttons.forEach(b=>{b.disabled=true;b.dataset.label=b.textContent;b.textContent='Загружаем…'});
+ try{
+  const response=await fetch('demo_reviews.csv');
+  if(!response.ok)throw new Error('Демо-файл не найден');
+  const data=parseCSV(await response.text());
+  setData(data,'демо: 25 фейк-отзывов');
+  $('#analysisStatus').classList.add('demo');
+  $('#analysisStatus').lastChild.textContent=' Демо-режим';
+  $('#fileFeedback').textContent='✓ Демо: загружено 25 вымышленных отзывов. Это не реальные данные.';
+  showToast('Демо-анализ готов');
+ }catch(e){showToast(e.message)}finally{buttons.forEach(b=>{b.disabled=false;b.textContent=b.dataset.label||'Запустить демо'})}
+}
+
 function exportCSV(){if(!analysis.length)return showToast('Нет данных для экспорта');const head=['Имя','Дата','Оценка','Отзыв','Тональность','Категории'];const lines=analysis.map(r=>[r.name,r.date,r.rating,r.text,{positive:'позитив',neutral:'нейтрально',negative:'негатив'}[r.sentiment],r.categories.join(', ')].map(v=>`"${String(v).replace(/"/g,'""')}"`).join(';'));const blob=new Blob(['\uFEFF'+head.join(';')+'\n'+lines.join('\n')],{type:'text/csv;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`ai-customer-insight_${new Date().toISOString().slice(0,10)}.csv`;a.click();URL.revokeObjectURL(a.href);showToast('Отчёт скачан')}
 
 function switchView(name){$$('.view').forEach(v=>v.classList.remove('active'));$$('.nav-item').forEach(v=>v.classList.toggle('active',v.dataset.view===name));$(`#${name}View`).classList.add('active');$('#pageTitle').textContent={dashboard:'Обзор отзывов',reviews:'Все отзывы',insights:'Рекомендации',about:'О проекте'}[name];$('.sidebar').classList.remove('open');window.scrollTo({top:0,behavior:'smooth'})}
 let toastTimer;function showToast(text){const t=$('#toast');t.textContent=text;t.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),2600)}
 
-$$('.nav-item').forEach(b=>b.addEventListener('click',()=>switchView(b.dataset.view)));$$('[data-go]').forEach(b=>b.addEventListener('click',()=>switchView(b.dataset.go)));$('#mobileMenu').addEventListener('click',()=>$('.sidebar').classList.toggle('open'));$('#uploadBtn').addEventListener('click',()=>$('#fileInput').click());$('#fileInput').addEventListener('change',e=>handleFile(e.target.files[0]));$('#exportBtn').addEventListener('click',exportCSV);$('#reviewSearch').addEventListener('input',renderReviews);$('#sentimentFilter').addEventListener('change',renderReviews);
+$$('.nav-item').forEach(b=>b.addEventListener('click',()=>switchView(b.dataset.view)));$$('[data-go]').forEach(b=>b.addEventListener('click',()=>switchView(b.dataset.go)));$$('[data-demo]').forEach(b=>b.addEventListener('click',loadDemo));$('#mobileMenu').addEventListener('click',()=>$('.sidebar').classList.toggle('open'));$('#uploadBtn').addEventListener('click',()=>$('#fileInput').click());$('#fileInput').addEventListener('change',e=>handleFile(e.target.files[0]));$('#exportBtn').addEventListener('click',exportCSV);$('#reviewSearch').addEventListener('input',renderReviews);$('#sentimentFilter').addEventListener('change',renderReviews);
 const dz=$('#dropZone');['dragenter','dragover'].forEach(e=>dz.addEventListener(e,x=>{x.preventDefault();dz.classList.add('dragging')}));['dragleave','drop'].forEach(e=>dz.addEventListener(e,x=>{x.preventDefault();dz.classList.remove('dragging')}));dz.addEventListener('drop',e=>handleFile(e.dataTransfer.files[0]));
 renderEmptyState();

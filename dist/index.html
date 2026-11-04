@@ -54,6 +54,7 @@
             <div><b>Загрузите отзывы для нового анализа</b><p>CSV до 5 МБ · Яндекс Карты, 2ГИС или собственная выгрузка</p></div>
           </div>
           <div class="upload-actions">
+            <button class="button subtle" data-demo>Запустить демо</button>
             <button class="button primary" id="uploadBtn">Выбрать CSV</button>
             <input type="file" id="fileInput" accept=".csv,text/csv" hidden>
           </div>
@@ -61,18 +62,37 @@
         <div class="file-feedback" id="fileFeedback" role="status"></div>
 
         <div class="empty-dashboard" id="emptyDashboard">
-          <div class="empty-orbit" aria-hidden="true"><span>+</span></div>
-          <p class="eyebrow">Начало работы</p>
-          <h2>Здесь появится анализ ваших отзывов</h2>
-          <p>Сейчас данных нет. Загрузите собственный CSV — после этого мы покажем тональность, категории, проблемные отзывы и рекомендации.</p>
-          <div class="empty-steps">
-            <div><b>1</b><span>Выгрузите отзывы<br>в формате CSV</span></div>
-            <i>→</i>
-            <div><b>2</b><span>Загрузите файл<br>в поле выше</span></div>
-            <i>→</i>
-            <div><b>3</b><span>Получите дашборд<br>и отчёт</span></div>
-          </div>
-          <a class="template-link" href="sample_reviews.csv" download>Скачать пустой шаблон CSV</a>
+          <section class="empty-intro">
+            <div class="empty-orbit" aria-hidden="true"><span>+</span></div>
+            <p class="eyebrow">Начало работы</p>
+            <h2>Превратите отзывы в понятные решения</h2>
+            <p>Загрузите собственный CSV или запустите готовый тест на 25 вымышленных отзывах. Все вычисления выполняются прямо в браузере.</p>
+            <div class="empty-cta">
+              <button class="button primary" data-demo>Посмотреть демо на 25 отзывах</button>
+              <span>Это займёт несколько секунд</span>
+            </div>
+            <div class="empty-steps">
+              <div><b>1</b><span>Загрузка<br>одного CSV</span></div>
+              <i>→</i>
+              <div><b>2</b><span>Анализ текста<br>и оценок</span></div>
+              <i>→</i>
+              <div><b>3</b><span>Готовый отчёт<br>для владельца</span></div>
+            </div>
+          </section>
+          <section class="preview-card" aria-label="Предпросмотр будущего дашборда">
+            <div class="preview-head"><div><small>ПРЕДПРОСМОТР</small><b>Что появится после анализа</b></div><span>DEMO</span></div>
+            <div class="preview-kpis"><div><small>Тональность</small><strong>3 класса</strong></div><div><small>Категории</small><strong>4 аспекта</strong></div></div>
+            <div class="preview-chart">
+              <div class="preview-donut"><span>AI</span></div>
+              <div class="preview-bars"><p><span>Сервис</span><i style="--w:86%"></i></p><p><span>Качество еды</span><i style="--w:72%"></i></p><p><span>Цена</span><i style="--w:48%"></i></p><p><span>Атмосфера</span><i style="--w:63%"></i></p></div>
+            </div>
+            <div class="preview-signal"><span>✦</span><div><small>Главный результат</small><b>Сильные стороны и проблемные сигналы — на одном экране</b></div></div>
+          </section>
+        </div>
+        <div class="empty-benefits" id="emptyBenefits">
+          <article><span>01</span><b>Без ручного разбора</b><p>Система сама группирует отзывы по темам и тональности.</p></article>
+          <article><span>02</span><b>Без отправки данных</b><p>CSV обрабатывается локально и не загружается на сервер.</p></article>
+          <article><span>03</span><b>С готовым выводом</b><p>Вместо таблицы — приоритетные жалобы и рекомендации.</p></article>
         </div>
 
         <div id="dataDashboard" hidden>
