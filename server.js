@@ -92,7 +92,7 @@ async function serveStatic(req,res){
  const relative=requestPath==='/'?'index.html':requestPath.replace(/^\/+/, '');
  const file=path.resolve(publicDir,relative);
  if(!file.startsWith(publicDir+path.sep)){sendJson(res,403,{error:'Доступ запрещён'});return}
- try{const info=await stat(file);if(!info.isFile())throw new Error();const body=await readFile(file);res.writeHead(200,{'content-type':mime[path.extname(file)]||'application/octet-stream','content-length':body.length,'cache-control':path.extname(file)==='.html'?'no-cache':'public, max-age=3600'});res.end(body)}catch{sendJson(res,404,{error:'Страница не найдена'})}
+ try{const info=await stat(file);if(!info.isFile())throw new Error();const body=await readFile(file);const extension=path.extname(file);const cacheControl=['.html','.js','.css'].includes(extension)?'no-cache':'public, max-age=3600';res.writeHead(200,{'content-type':mime[extension]||'application/octet-stream','content-length':body.length,'cache-control':cacheControl});res.end(body)}catch{sendJson(res,404,{error:'Страница не найдена'})}
 }
 
 export function createServer(){return http.createServer(async(req,res)=>{
