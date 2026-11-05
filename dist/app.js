@@ -103,21 +103,55 @@ function renderReviews(){const q=($('#reviewSearch')?.value||'').toLowerCase();c
 
 function renderInsight(){const stats=categoryStats();const best=[...stats].sort((a,b)=>(b.count-b.negative)-(a.count-a.negative))[0];const worst=[...stats].sort((a,b)=>b.negative-a.negative)[0];if(!analysis.length)return;$('#mainInsightTitle').textContent=best&&best.count?`Сильная сторона — ${best.name.toLowerCase()}`:'Недостаточно данных для вывода';$('#mainInsightText').textContent=worst&&worst.negative?`При этом в категории «${worst.name}» найдено ${worst.negative} негативных ${plural(worst.negative,'сигнал','сигнала','сигналов')}. Начните улучшения с неё.`:'Критичных повторяющихся жалоб в выборке не обнаружено.'}
 
+function situationalAdvice(stat){
+ const text=stat.items.filter(x=>x.sentiment==='negative').map(x=>x.text.toLowerCase().replace(/ё/g,'е')).join(' ');
+ const has=(...words)=>words.some(word=>text.includes(word));
+ if(stat.name==='Сервис'){
+  if(has('ждать','ждали','долго','очеред'))return 'Главная жалоба связана с ожиданием. Замерьте время обслуживания в часы пик и перераспределите нагрузку команды.';
+  if(has('груб','хам','невежлив','отношен'))return 'В отзывах критикуют общение сотрудников. Разберите конкретные ситуации с командой и закрепите стандарт спокойного ответа клиенту.';
+ }
+ if(stat.name==='Качество'){
+  if(has('холодн','сыр','несвеж','невкус'))return 'Клиенты указывают на качество самого продукта. Проверьте приготовление, хранение и контроль перед выдачей.';
+  if(has('сломал','брак','дефект'))return 'Есть сигналы о дефектах. Усильте проверку результата перед передачей клиенту и упростите замену.';
+ }
+ if(stat.name==='Цена')return 'Негатив связан с восприятием стоимости. Покажите состав предложения, результат и выгоду до оплаты, чтобы цена не становилась неожиданностью.';
+ if(stat.name==='Комфорт'){
+  if(has('гряз','чист'))return 'В отзывах затронута чистота. Добавьте проверку зала и санузлов по расписанию с отметкой ответственного.';
+  if(has('шум','громк','музык'))return 'Клиенты упоминают шум. Проверьте громкость музыки и самые шумные зоны в часы пик.';
+  if(has('тесно','холодн','жарк'))return 'Жалобы связаны с физическим комфортом. Проверьте посадку и температуру именно в периоды, указанные гостями.';
+ }
+ if(stat.name==='Удобство'){
+  if(has('парков'))return 'Клиентам сложно с парковкой. Добавьте на сайт и в карточку понятную схему подъезда и ближайшие альтернативы.';
+  if(has('достав','запис','сайт','прилож'))return 'Есть затруднения на пути к услуге. Пройдите сценарий клиента от записи до получения результата и уберите лишний шаг.';
+ }
+ if(stat.name==='Надёжность')return 'Отзывы указывают на несоблюдение срока или обещания. Фиксируйте срок письменно и предупреждайте клиента о риске задержки заранее.';
+ if(stat.name==='Общее впечатление')return 'Разберите негативные отзывы целиком: в них нет одной узкой причины. Свяжитесь с клиентами и уточните момент, который сильнее всего повлиял на итоговую оценку.';
+ return 'Разберите конкретные негативные отзывы с ответственным сотрудником и проверьте результат после изменения процесса.';
+}
+
 function renderRecommendations(){
  const stats=categoryStats().filter(x=>x.count);
  const strengthCopy={'Сервис':'Закрепите удачные сценарии общения и используйте их при обучении команды.','Качество':'Зафиксируйте стандарты продукта и регулярно проверяйте стабильность результата.','Цена':'Сохраняйте прозрачность цен и подчёркивайте ценность предложения.','Комфорт':'Сохраните удачные решения по чистоте, атмосфере и удобству пространства.','Удобство':'Продолжайте упрощать путь клиента — от поиска компании до получения услуги.','Надёжность':'Используйте соблюдение обещаний и сроков как аргумент в коммуникации.','Общее впечатление':'Просите довольных клиентов делиться опытом и возвращаться снова.'};
- const growthCopy={'Сервис':'Проверьте время ожидания и сценарии общения. Введите короткий чек-лист смены.','Качество':'Разберите случаи с низкими оценками и проверьте стабильность результата.','Цена':'Покажите клиенту, из чего складывается стоимость и какую ценность он получает.','Комфорт':'Проверьте чистоту, шум, свет и загруженность в часы пик.','Удобство':'Уберите лишние шаги в записи, доставке, оплате или поиске компании.','Надёжность':'Зафиксируйте сроки и ответственных, заранее сообщайте клиенту о задержках.','Общее впечатление':'Свяжитесь с недовольными клиентами и найдите повторяющуюся причину разочарования.'};
- const strengths=[...stats].sort((a,b)=>b.score-a.score||b.count-a.count).slice(0,4);
- const weaknesses=[...stats].sort((a,b)=>b.negative-a.negative||b.rate-a.rate).slice(0,4);
+ const growthCopy=Object.fromEntries(stats.map(x=>[x.name,situationalAdvice(x)]));
+ const strengths=stats.filter(x=>x.positive>0).sort((a,b)=>b.score-a.score||b.count-a.count).slice(0,4);
+ const weaknesses=stats.filter(x=>x.negative>0).sort((a,b)=>b.negative-a.negative||b.rate-a.rate).slice(0,4);
+ const negativeTotal=analysis.filter(x=>x.sentiment==='negative').length;
+ const rated=analysis.filter(x=>x.rating>0);
+ const averageRating=rated.length?rated.reduce((sum,x)=>sum+x.rating,0)/rated.length:0;
+ const excellent=negativeTotal===0&&averageRating>=4.8;
  const strengthCards=strengths.map(x=>`<article class="rec-card strength-card"><span>${x.positiveRate}% позитивных</span><h3>${x.name}</h3><p>${strengthCopy[x.name]} Основание: ${x.positive} ${plural(x.positive,'положительный отзыв','положительных отзыва','положительных отзывов')} из ${x.count}.</p></article>`).join('');
- const weaknessCards=weaknesses.map((x,i)=>`<article class="rec-card growth-card">${i===0&&x.negative?'<span class="priority">приоритет</span>':''}<span>${x.rate}% негативных</span><h3>${x.name}</h3><p>${growthCopy[x.name]} Основание: ${x.negative} ${plural(x.negative,'негативный сигнал','негативных сигнала','негативных сигналов')} из ${x.count}.</p></article>`).join('');
- $('#recommendations').innerHTML=`<section class="rec-group strengths"><div class="rec-group-head"><i>+</i><div><p class="eyebrow">Сильные стороны</p><h2>Что особенно ценят гости</h2></div></div><div class="rec-stack">${strengthCards}</div></section><section class="rec-group weaknesses"><div class="rec-group-head"><i>!</i><div><p class="eyebrow">Зоны роста</p><h2>Что стоит улучшить</h2></div></div><div class="rec-stack">${weaknessCards}</div></section>`;
- renderDetailedInsights(stats,strengthCopy,growthCopy);
+ const weaknessCards=weaknesses.map((x,i)=>`<article class="rec-card growth-card">${i===0?'<span class="priority">приоритет</span>':''}<span>${x.rate}% негативных</span><h3>${x.name}</h3><p>${growthCopy[x.name]} Основание: ${x.negative} ${plural(x.negative,'негативный сигнал','негативных сигнала','негативных сигналов')} из ${x.count}.</p></article>`).join('');
+ const clearTitle=excellent?'У вас всё хорошо — проблем не найдено':'Критичных проблем не обнаружено';
+ const clearText=excellent?`Средняя оценка — ${formatNumber(averageRating)} из 5, негативных сигналов нет. Не нужно придумывать срочные исправления: сохраняйте текущие стандарты и следите, чтобы качество оставалось стабильным.`:`В загруженной выборке нет негативных сигналов. Сохраняйте сильные стороны и продолжайте собирать отзывы — при появлении повторяющейся жалобы система покажет её здесь.`;
+ const growthContent=weaknesses.length?weaknessCards:`<article class="rec-card clear-card"><span>0 проблемных сигналов</span><h3>${clearTitle}</h3><p>${clearText}${analysis.length<10?' Выборка пока небольшая, поэтому вывод стоит перепроверить после появления новых отзывов.':''}</p></article>`;
+ const growthHead=weaknesses.length?'<p class="eyebrow">Зоны роста</p><h2>Что стоит улучшить</h2>':'<p class="eyebrow">Текущая ситуация</p><h2>Нужно ли что-то исправлять</h2>';
+ $('#recommendations').innerHTML=`<section class="rec-group strengths"><div class="rec-group-head"><i>+</i><div><p class="eyebrow">Сильные стороны</p><h2>Что особенно ценят гости</h2></div></div><div class="rec-stack">${strengthCards||'<article class="rec-card clear-card"><h3>Пока недостаточно позитивных сигналов</h3><p>Добавьте больше отзывов, чтобы надёжно определить сильные стороны.</p></article>'}</div></section><section class="rec-group ${weaknesses.length?'weaknesses':'clear-results'}"><div class="rec-group-head"><i>${weaknesses.length?'!':'✓'}</i><div>${growthHead}</div></div><div class="rec-stack">${growthContent}</div></section>`;
+ renderDetailedInsights(stats,strengthCopy,growthCopy,weaknesses,excellent,averageRating);
 }
 
 function shortQuote(text,max=180){const value=String(text||'').trim();return value.length>max?value.slice(0,max).trim()+'…':value}
 
-function renderDetailedInsights(stats,strengthCopy,growthCopy){
+function renderDetailedInsights(stats,strengthCopy,growthCopy,weaknesses,excellent,averageRating){
  $('#categoryScorecards').innerHTML=Object.keys(dictionaries.categories).map(name=>{
   const item=stats.find(x=>x.name===name)||{name,count:0,positive:0,negative:0,score:0};
   return `<article class="score-card ${item.score<45&&item.count?'critical':''}"><header><h3>${item.name}</h3><strong>${item.count?item.score+'%':'—'}</strong></header><div class="mini-track"><i style="width:${item.score}%"></i></div><p>${item.count?`${item.count} упоминаний · ${item.positive} позитивных · ${item.negative} негативных`:'В текущей выборке аспект почти не упоминается'}</p></article>`
@@ -125,13 +159,16 @@ function renderDetailedInsights(stats,strengthCopy,growthCopy){
  const positive=[...analysis].filter(x=>x.sentiment==='positive').sort((a,b)=>b.score-a.score).slice(0,3);
  const negative=[...analysis].filter(x=>x.sentiment==='negative').sort((a,b)=>a.score-b.score||a.rating-b.rating).slice(0,3);
  const quotes=(items,empty)=>items.length?items.map(r=>`<blockquote class="evidence-quote">«${escapeHtml(shortQuote(r.text))}»<b>${escapeHtml(r.name)} · ${r.rating?`${r.rating}/5`:'без оценки'} · ${escapeHtml(r.categories[0])}</b></blockquote>`).join(''):`<p class="evidence-quote">${empty}</p>`;
- $('#evidenceGrid').innerHTML=`<article class="evidence-column positive"><h3>Что подтверждает сильные стороны</h3>${quotes(positive,'Явных положительных цитат в выборке не найдено.')}</article><article class="evidence-column negative"><h3>Что требует внимания</h3>${quotes(negative,'Явных негативных цитат в выборке не найдено.')}</article>`;
- const weakest=[...stats].sort((a,b)=>b.negative-a.negative||b.rate-a.rate).slice(0,3);
- const fallback=[{name:'Обратная связь',negative:0},{name:'Контроль результата',negative:0},{name:'Повторный анализ',negative:0}];
- const steps=(weakest.length?weakest:fallback).map((x,i)=>({
+ const negativeEvidence=negative.length?quotes(negative,''):`<div class="all-clear"><b>✓ Всё спокойно</b><p>${excellent?`При средней оценке ${formatNumber(averageRating)} из 5 в выборке нет отзывов, требующих исправлений.`:'В загруженных отзывах не найдено проблемных сигналов.'}</p></div>`;
+ $('#evidenceGrid').innerHTML=`<article class="evidence-column positive"><h3>Что подтверждает сильные стороны</h3>${quotes(positive,'Явных положительных цитат в выборке не найдено.')}</article><article class="evidence-column ${negative.length?'negative':'clear'}"><h3>${negative.length?'Что требует внимания':'Проблемные сигналы'}</h3>${negativeEvidence}</article>`;
+ const steps=weaknesses.length?weaknesses.slice(0,3).map((x,i)=>({
   title:i===0?`Сначала: ${x.name}`:i===1?`Затем: ${x.name}`:`Закрепить: ${x.name}`,
-  text:i===0?`${growthCopy[x.name]||'Разберите повторяющиеся сигналы и назначьте ответственного.'} Срок — первая неделя.`:i===1?`${growthCopy[x.name]||'Проверьте изменения на практике.'} Срок — до 14 дней.`:`${x.negative?growthCopy[x.name]:'Соберите новые отзывы и сравните показатели.'} Контрольная точка — через 30 дней.`
- }));
+  text:i===0?`${growthCopy[x.name]} Срок — первая неделя.`:i===1?`${growthCopy[x.name]} Срок — до 14 дней.`:`${growthCopy[x.name]} Контрольная точка — через 30 дней.`
+ })):[
+  {title:'Сохранить текущие стандарты',text:'Не меняйте процессы только ради изменений: клиенты уже оценивают опыт положительно.'},
+  {title:'Поддерживать обратную связь',text:'Отвечайте на новые отзывы и отмечайте даже единичные замечания, если они появятся.'},
+  {title:'Проверить динамику через месяц',text:'Загрузите свежие отзывы и убедитесь, что высокая оценка и отсутствие жалоб сохраняются.'}
+ ];
  $('#actionPlan').innerHTML=steps.map((x,i)=>`<article class="action-step"><span>${i+1}</span><h3>${x.title}</h3><p>${x.text}</p></article>`).join('');
 }
 
