@@ -1,16 +1,20 @@
 const dictionaries={
- positive:['отличн','вкусн','уютн','прекрасн','хорош','быстр','вежлив','приятн','свеж','лучший','понрав','доброжел','верн','адекватн','красив'],
- negative:['плох','долго','холодн','дорог','невкусн','разочар','час','маленьк','тесно','груб','гряз','ужас','медлен','ждать','ждали'],
+ positive:['отличн','вкусн','уютн','прекрасн','хорош','быстр','вежлив','приятн','свеж','лучший','понрав','доброжел','верн','адекватн','красив','удобн','чист','качествен','рекоменд','профессион','оперативн','надежн'],
+ negative:['плох','долго','холодн','дорог','невкусн','разочар','час','маленьк','тесно','груб','гряз','ужас','медлен','ждать','ждали','неудобн','сломал','обман','ошиб','хам','задерж','очеред','шумн'],
  categories:{
   'Сервис':['официант','персонал','сервис','обслуж','бариста','сотрудник','ждать','ждали','быстр','вежлив','груб'],
-  'Качество еды':['еда','блюд','вкус','паста','кофе','десерт','суп','порци','завтрак','свеж','холодн'],
+  'Качество':['еда','блюд','вкус','паста','кофе','десерт','суп','порци','завтрак','свеж','холодн','качеств','товар','работ','результат'],
   'Цена':['цен','дорог','стоимост','дёшев','дешев'],
-  'Атмосфера':['атмосфер','интерьер','уют','музык','зал','чист','тесно','красив']
+  'Комфорт':['атмосфер','интерьер','уют','музык','зал','чист','тесно','красив','комфорт','шум'],
+  'Удобство':['удоб','располож','парков','сайт','запис','достав','приложен','очеред'],
+  'Надёжность':['надеж','гарант','срок','обещ','вовремя','задерж','сломал','возврат'],
+  'Общее впечатление':['впечатлен','рекоменд','вернусь','понрав','разочар','любим','лучший','ужас']
  }
 };
 
 let reviews=[];
 let analysis=[];
+let company=null;
 
 const $=s=>document.querySelector(s);
 const $$=s=>[...document.querySelectorAll(s)];
@@ -29,8 +33,9 @@ function classify(review){
  return {...review,sentiment,categories:categories.length?categories:['Сервис'],score};
 }
 
-function setData(data,label='загруженный файл'){
- reviews=data.filter(r=>r.text&&String(r.text).trim()).map((r,i)=>({name:r.name||`Гость ${i+1}`,date:r.date||'—',rating:Number(r.rating)||0,text:String(r.text).trim()}));
+function setData(data,label='загруженный файл',companyData=null){
+ company=companyData;
+ reviews=data.filter(r=>r.text&&String(r.text).trim()).map((r,i)=>({name:r.name||`Гость ${i+1}`,date:r.date||'—',rating:Math.max(0,Math.min(5,Math.round(Number(r.rating)||0))),text:String(r.text).trim(),reply:r.reply||''}));
  if(!reviews.length)throw new Error('В файле нет непустых отзывов');
  analysis=reviews.map(classify);
  $('#emptyDashboard').hidden=true;
@@ -39,21 +44,36 @@ function setData(data,label='загруженный файл'){
  $('#dataDashboard').hidden=false;
  $('#analysisStatus').classList.remove('pending');
  $('#analysisStatus').lastChild.textContent=' Анализ завершён';
+ renderCompany();
  renderAll(label);
+}
+
+function renderCompany(){
+ const banner=$('#companyBanner');
+ if(!company){banner.hidden=true;return}
+ banner.hidden=false;
+ $('#companyName').textContent=company.name||'Компания в Яндекс Картах';
+ $('#companyAddress').textContent=company.address||'Адрес не указан';
+ $('#companyRating').textContent=company.rating?formatNumber(company.rating):'—';
+ $('#companySourceCount').textContent=company.reviewCount||reviews.length;
+ $('#companyLink').href=company.url||'#';
 }
 
 function renderEmptyState(){
  reviews=[];analysis=[];
+ company=null;
  localStorage.removeItem('aci-last-data');
  $('#emptyDashboard').hidden=false;
  $('#emptyBenefits').hidden=false;
  $('#formatGuide').hidden=false;
  $('#dataDashboard').hidden=true;
+ $('#companyBanner').hidden=true;
  $('#reviewCountBadge').textContent='0';
  $('#analysisStatus').classList.add('pending');
  $('#analysisStatus').lastChild.textContent=' Ожидаем данные';
  $('#reviewList').innerHTML='<div class="empty">Сначала загрузите CSV с отзывами на странице «Обзор».</div>';
  $('#recommendations').innerHTML='<div class="empty">Рекомендации появятся после загрузки и анализа отзывов.</div>';
+ $('#categoryScorecards').innerHTML='';$('#evidenceGrid').innerHTML='';$('#actionPlan').innerHTML='';
  $('#healthScore').textContent='0';
 }
 
@@ -71,7 +91,7 @@ function renderAll(label){
  $('#healthScore').textContent=Math.round(Math.max(0,Math.min(100,p*.7+(avg/5*100)*.3)));
 }
 
-function categoryStats(){return Object.keys(dictionaries.categories).map(name=>{const items=analysis.filter(r=>r.categories.includes(name));const negative=items.filter(r=>r.sentiment==='negative').length;const positive=items.filter(r=>r.sentiment==='positive').length;return{name,count:items.length,negative,positive,rate:items.length?Math.round(negative/items.length*100):0,positiveRate:items.length?Math.round(positive/items.length*100):0}}).sort((a,b)=>b.count-a.count)}
+function categoryStats(){return Object.keys(dictionaries.categories).map(name=>{const items=analysis.filter(r=>r.categories.includes(name));const negative=items.filter(r=>r.sentiment==='negative').length;const positive=items.filter(r=>r.sentiment==='positive').length;const neutral=items.length-negative-positive;const score=items.length?Math.round((positive+neutral*.5)/items.length*100):0;return{name,count:items.length,items,negative,positive,neutral,score,rate:items.length?Math.round(negative/items.length*100):0,positiveRate:items.length?Math.round(positive/items.length*100):0}}).sort((a,b)=>b.count-a.count)}
 function renderCategories(){const max=Math.max(1,...categoryStats().map(x=>x.count));$('#categoryBars').innerHTML=categoryStats().map(x=>`<div class="bar-row"><div class="bar-label"><span>${x.name}</span><b>${x.count} · ${x.rate}% негатив</b></div><div class="track"><i style="width:${Math.round(x.count/max*100)}%"></i></div></div>`).join('')}
 
 function parseDate(raw){const p=String(raw).match(/(\d{1,2})[.\/-](\d{1,2})[.\/-](\d{2,4})/);if(!p)return null;const y=p[3].length===2?'20'+p[3]:p[3];return new Date(+y,+p[2]-1,+p[1])}
@@ -85,13 +105,34 @@ function renderInsight(){const stats=categoryStats();const best=[...stats].sort(
 
 function renderRecommendations(){
  const stats=categoryStats().filter(x=>x.count);
- const strengthCopy={'Сервис':'Гости ценят работу команды. Закрепите удачные сценарии общения и используйте их при обучении новых сотрудников.','Качество еды':'Качество продукта формирует лояльность. Сохраните стандарты приготовления и регулярно проверяйте стабильность подачи.','Цена':'Гости видят ценность предложения. Подчёркивайте выгоду комплектов и сохраняйте прозрачность цен.','Атмосфера':'Обстановка помогает получать хорошие оценки. Сохраните удачные решения по чистоте, свету, музыке и комфорту.'};
- const growthCopy={'Сервис':'Проверьте время ожидания и сценарии общения сотрудников. Введите короткий чек-лист смены.','Качество еды':'Разберите блюда, которые получают низкие оценки, и проверьте стабильность подачи.','Цена':'Сделайте ценность предложения понятнее: состав, размер порции и выгоду комплектов.','Атмосфера':'Проверьте чистоту, музыку, свет и плотность посадки в часы пик.'};
- const strengths=[...stats].sort((a,b)=>b.positiveRate-a.positiveRate||b.positive-a.positive).slice(0,2);
- const weaknesses=[...stats].sort((a,b)=>b.negative-a.negative||b.rate-a.rate).slice(0,2);
+ const strengthCopy={'Сервис':'Закрепите удачные сценарии общения и используйте их при обучении команды.','Качество':'Зафиксируйте стандарты продукта и регулярно проверяйте стабильность результата.','Цена':'Сохраняйте прозрачность цен и подчёркивайте ценность предложения.','Комфорт':'Сохраните удачные решения по чистоте, атмосфере и удобству пространства.','Удобство':'Продолжайте упрощать путь клиента — от поиска компании до получения услуги.','Надёжность':'Используйте соблюдение обещаний и сроков как аргумент в коммуникации.','Общее впечатление':'Просите довольных клиентов делиться опытом и возвращаться снова.'};
+ const growthCopy={'Сервис':'Проверьте время ожидания и сценарии общения. Введите короткий чек-лист смены.','Качество':'Разберите случаи с низкими оценками и проверьте стабильность результата.','Цена':'Покажите клиенту, из чего складывается стоимость и какую ценность он получает.','Комфорт':'Проверьте чистоту, шум, свет и загруженность в часы пик.','Удобство':'Уберите лишние шаги в записи, доставке, оплате или поиске компании.','Надёжность':'Зафиксируйте сроки и ответственных, заранее сообщайте клиенту о задержках.','Общее впечатление':'Свяжитесь с недовольными клиентами и найдите повторяющуюся причину разочарования.'};
+ const strengths=[...stats].sort((a,b)=>b.score-a.score||b.count-a.count).slice(0,4);
+ const weaknesses=[...stats].sort((a,b)=>b.negative-a.negative||b.rate-a.rate).slice(0,4);
  const strengthCards=strengths.map(x=>`<article class="rec-card strength-card"><span>${x.positiveRate}% позитивных</span><h3>${x.name}</h3><p>${strengthCopy[x.name]} Основание: ${x.positive} ${plural(x.positive,'положительный отзыв','положительных отзыва','положительных отзывов')} из ${x.count}.</p></article>`).join('');
  const weaknessCards=weaknesses.map((x,i)=>`<article class="rec-card growth-card">${i===0&&x.negative?'<span class="priority">приоритет</span>':''}<span>${x.rate}% негативных</span><h3>${x.name}</h3><p>${growthCopy[x.name]} Основание: ${x.negative} ${plural(x.negative,'негативный сигнал','негативных сигнала','негативных сигналов')} из ${x.count}.</p></article>`).join('');
  $('#recommendations').innerHTML=`<section class="rec-group strengths"><div class="rec-group-head"><i>+</i><div><p class="eyebrow">Сильные стороны</p><h2>Что особенно ценят гости</h2></div></div><div class="rec-stack">${strengthCards}</div></section><section class="rec-group weaknesses"><div class="rec-group-head"><i>!</i><div><p class="eyebrow">Зоны роста</p><h2>Что стоит улучшить</h2></div></div><div class="rec-stack">${weaknessCards}</div></section>`;
+ renderDetailedInsights(stats,strengthCopy,growthCopy);
+}
+
+function shortQuote(text,max=180){const value=String(text||'').trim();return value.length>max?value.slice(0,max).trim()+'…':value}
+
+function renderDetailedInsights(stats,strengthCopy,growthCopy){
+ $('#categoryScorecards').innerHTML=Object.keys(dictionaries.categories).map(name=>{
+  const item=stats.find(x=>x.name===name)||{name,count:0,positive:0,negative:0,score:0};
+  return `<article class="score-card ${item.score<45&&item.count?'critical':''}"><header><h3>${item.name}</h3><strong>${item.count?item.score+'%':'—'}</strong></header><div class="mini-track"><i style="width:${item.score}%"></i></div><p>${item.count?`${item.count} упоминаний · ${item.positive} позитивных · ${item.negative} негативных`:'В текущей выборке аспект почти не упоминается'}</p></article>`
+ }).join('');
+ const positive=[...analysis].filter(x=>x.sentiment==='positive').sort((a,b)=>b.score-a.score).slice(0,3);
+ const negative=[...analysis].filter(x=>x.sentiment==='negative').sort((a,b)=>a.score-b.score||a.rating-b.rating).slice(0,3);
+ const quotes=(items,empty)=>items.length?items.map(r=>`<blockquote class="evidence-quote">«${escapeHtml(shortQuote(r.text))}»<b>${escapeHtml(r.name)} · ${r.rating?`${r.rating}/5`:'без оценки'} · ${escapeHtml(r.categories[0])}</b></blockquote>`).join(''):`<p class="evidence-quote">${empty}</p>`;
+ $('#evidenceGrid').innerHTML=`<article class="evidence-column positive"><h3>Что подтверждает сильные стороны</h3>${quotes(positive,'Явных положительных цитат в выборке не найдено.')}</article><article class="evidence-column negative"><h3>Что требует внимания</h3>${quotes(negative,'Явных негативных цитат в выборке не найдено.')}</article>`;
+ const weakest=[...stats].sort((a,b)=>b.negative-a.negative||b.rate-a.rate).slice(0,3);
+ const fallback=[{name:'Обратная связь',negative:0},{name:'Контроль результата',negative:0},{name:'Повторный анализ',negative:0}];
+ const steps=(weakest.length?weakest:fallback).map((x,i)=>({
+  title:i===0?`Сначала: ${x.name}`:i===1?`Затем: ${x.name}`:`Закрепить: ${x.name}`,
+  text:i===0?`${growthCopy[x.name]||'Разберите повторяющиеся сигналы и назначьте ответственного.'} Срок — первая неделя.`:i===1?`${growthCopy[x.name]||'Проверьте изменения на практике.'} Срок — до 14 дней.`:`${x.negative?growthCopy[x.name]:'Соберите новые отзывы и сравните показатели.'} Контрольная точка — через 30 дней.`
+ }));
+ $('#actionPlan').innerHTML=steps.map((x,i)=>`<article class="action-step"><span>${i+1}</span><h3>${x.title}</h3><p>${x.text}</p></article>`).join('');
 }
 
 function parseCSV(text){
@@ -101,9 +142,25 @@ function parseCSV(text){
 
 function handleFile(file){if(!file)return;if(!file.name.toLowerCase().endsWith('.csv'))return showToast('Нужен файл в формате CSV');if(file.size>5*1024*1024)return showToast('Файл больше 5 МБ');const reader=new FileReader();reader.onload=()=>{try{const data=parseCSV(reader.result);setData(data,file.name);$('#fileFeedback').textContent=`✓ ${file.name}: проанализировано ${data.length} ${plural(data.length,'отзыв','отзыва','отзывов')}`;showToast('Анализ завершён')}catch(e){showToast(e.message);$('#fileFeedback').textContent='Не удалось прочитать файл. Проверьте заголовки колонок.'}};reader.readAsText(file,'UTF-8')}
 
+async function importYandex(event){
+ event.preventDefault();
+ const url=$('#yandexUrl').value.trim();const button=$('#yandexBtn');const feedback=$('#importFeedback');
+ if(!url)return;
+ button.classList.add('loading');button.disabled=true;button.firstChild.textContent='Загружаем';feedback.className='import-feedback';feedback.textContent='Получаем публичные отзывы и данные компании…';
+ try{
+  const response=await fetch('/api/import/yandex',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url})});
+  const payload=await response.json().catch(()=>({}));
+  if(!response.ok)throw new Error(payload.error||'Не удалось загрузить отзывы по этой ссылке');
+  setData(payload.reviews,`Яндекс Карты · ${payload.reviews.length} отзывов`,payload.company);
+  feedback.className='import-feedback success';feedback.textContent=`Готово: загружено и проанализировано ${payload.reviews.length} ${plural(payload.reviews.length,'отзыв','отзыва','отзывов')}`;
+  showToast('Анализ компании готов');
+ }catch(error){feedback.className='import-feedback error';feedback.textContent=error.message;showToast('Импорт не выполнен')}
+ finally{button.classList.remove('loading');button.disabled=false;button.textContent='Проанализировать'}
+}
+
 function switchView(name){$$('.view').forEach(v=>v.classList.remove('active'));$$('.nav-item').forEach(v=>v.classList.toggle('active',v.dataset.view===name));$(`#${name}View`).classList.add('active');$('#pageTitle').textContent={dashboard:'Обзор отзывов',reviews:'Все отзывы',insights:'Рекомендации',about:'О проекте'}[name];$('.sidebar').classList.remove('open');window.scrollTo({top:0,behavior:'smooth'})}
 let toastTimer;function showToast(text){const t=$('#toast');t.textContent=text;t.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),2600)}
 
-$$('.nav-item').forEach(b=>b.addEventListener('click',()=>switchView(b.dataset.view)));$$('[data-go]').forEach(b=>b.addEventListener('click',()=>switchView(b.dataset.go)));$('#mobileMenu').addEventListener('click',()=>$('.sidebar').classList.toggle('open'));$('#uploadBtn').addEventListener('click',()=>$('#fileInput').click());$('#emptyUploadBtn').addEventListener('click',()=>$('#fileInput').click());$('#fileInput').addEventListener('change',e=>handleFile(e.target.files[0]));$('#reviewSearch').addEventListener('input',renderReviews);$('#sentimentFilter').addEventListener('change',renderReviews);
+$$('.nav-item').forEach(b=>b.addEventListener('click',()=>switchView(b.dataset.view)));$$('[data-go]').forEach(b=>b.addEventListener('click',()=>switchView(b.dataset.go)));$('#mobileMenu').addEventListener('click',()=>$('.sidebar').classList.toggle('open'));$('#uploadBtn').addEventListener('click',()=>$('#fileInput').click());$('#emptyUploadBtn').addEventListener('click',()=>$('#fileInput').click());$('#fileInput').addEventListener('change',e=>handleFile(e.target.files[0]));$('#reviewSearch').addEventListener('input',renderReviews);$('#sentimentFilter').addEventListener('change',renderReviews);$('#yandexForm').addEventListener('submit',importYandex);
 const dz=$('#dropZone');['dragenter','dragover'].forEach(e=>dz.addEventListener(e,x=>{x.preventDefault();dz.classList.add('dragging')}));['dragleave','drop'].forEach(e=>dz.addEventListener(e,x=>{x.preventDefault();dz.classList.remove('dragging')}));dz.addEventListener('drop',e=>handleFile(e.dataTransfer.files[0]));
 renderEmptyState();

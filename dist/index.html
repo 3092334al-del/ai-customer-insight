@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="empty-state.css">
   <link rel="stylesheet" href="readability.css">
+  <link rel="stylesheet" href="product.css">
 </head>
 <body>
   <div class="app-shell">
@@ -24,9 +25,9 @@
         <button class="nav-item" data-view="about"><span>◎</span>О проекте</button>
       </nav>
 
-      <div class="team-card">
-        <div class="avatar">AИ</div>
-        <div><b>Команда проекта</b><small>Сириус.Лето · 2026</small></div>
+      <div class="product-status">
+        <span></span>
+        <div><b>Сервис работает</b><small>Анализ без регистрации</small></div>
       </div>
     </aside>
 
@@ -43,6 +44,20 @@
       </header>
 
       <section class="view active" id="dashboardView">
+        <section class="source-hero">
+          <div class="source-copy">
+            <p class="eyebrow">Быстрый анализ компании</p>
+            <h2>Вставьте ссылку на компанию в Яндекс Картах</h2>
+            <p>Сервис загрузит доступные публичные отзывы, найдёт сильные и слабые стороны и составит план улучшений.</p>
+          </div>
+          <form class="yandex-form" id="yandexForm">
+            <label for="yandexUrl">Ссылка на карточку компании</label>
+            <div class="url-control"><span>Я</span><input id="yandexUrl" type="url" required placeholder="https://yandex.ru/maps/org/..."><button class="button primary" id="yandexBtn" type="submit">Проанализировать</button></div>
+            <div class="import-feedback" id="importFeedback" role="status">Можно вставить обычную или короткую ссылку Яндекс Карт</div>
+          </form>
+        </section>
+
+        <div class="source-divider"><span>или загрузите собственную выгрузку</span></div>
         <div class="upload-card" id="dropZone">
           <div class="upload-copy">
             <span class="upload-icon">↥</span>
@@ -55,15 +70,20 @@
         </div>
         <div class="file-feedback" id="fileFeedback" role="status"></div>
 
+        <article class="company-banner" id="companyBanner" hidden>
+          <div><small>АНАЛИЗ КОМПАНИИ</small><h2 id="companyName">Компания</h2><p id="companyAddress"></p></div>
+          <div class="company-facts"><span><b id="companyRating">—</b> рейтинг</span><span><b id="companySourceCount">—</b> отзывов на площадке</span><a id="companyLink" target="_blank" rel="noopener">Открыть карточку ↗</a></div>
+        </article>
+
         <div class="empty-dashboard" id="emptyDashboard">
           <section class="empty-intro">
             <div class="empty-orbit" aria-hidden="true"><span>+</span></div>
             <p class="eyebrow">Начало работы</p>
             <h2>Превратите отзывы в понятные решения</h2>
-            <p>Загрузите собственный CSV с отзывами — система покажет тональность, ключевые темы, проблемные сигналы и рекомендации. Все вычисления выполняются прямо в браузере.</p>
+            <p>Вставьте ссылку Яндекс Карт или загрузите CSV — система покажет тональность, ключевые темы, доказательства из отзывов и практические рекомендации.</p>
             <div class="empty-cta">
-              <button class="button primary" id="emptyUploadBtn">Загрузить отзывы</button>
-              <span>CSV до 5 МБ · данные не покидают устройство</span>
+              <button class="button primary" id="emptyUploadBtn">Загрузить CSV</button>
+              <span>Также можно использовать ссылку выше</span>
             </div>
             <div class="empty-steps">
               <div><b>1</b><span>Загрузка<br>одного CSV</span></div>
@@ -75,7 +95,7 @@
           </section>
           <section class="preview-card" aria-label="Предпросмотр будущего дашборда">
             <div class="preview-head"><div><small>ПРЕДПРОСМОТР</small><b>Что появится после анализа</b></div><span>ПРИМЕР</span></div>
-            <div class="preview-kpis"><div><small>Тональность</small><strong>3 класса</strong></div><div><small>Категории</small><strong>4 аспекта</strong></div></div>
+            <div class="preview-kpis"><div><small>Тональность</small><strong>3 класса</strong></div><div><small>Категории</small><strong>7 аспектов</strong></div></div>
             <div class="preview-chart">
               <div class="preview-donut"><span>AI</span></div>
               <div class="preview-bars"><p><span>Сервис</span><i style="--w:86%"></i></p><p><span>Качество еды</span><i style="--w:72%"></i></p><p><span>Цена</span><i style="--w:48%"></i></p><p><span>Атмосфера</span><i style="--w:63%"></i></p></div>
@@ -85,7 +105,7 @@
         </div>
         <div class="empty-benefits" id="emptyBenefits">
           <article><span>01</span><b>Без ручного разбора</b><p>Система сама группирует отзывы по темам и тональности.</p></article>
-          <article><span>02</span><b>Без отправки данных</b><p>CSV обрабатывается локально и не загружается на сервер.</p></article>
+          <article><span>02</span><b>Два способа загрузки</b><p>Ссылка Яндекс Карт или собственный CSV-файл.</p></article>
           <article><span>03</span><b>С готовым выводом</b><p>Вместо таблицы — приоритетные жалобы и рекомендации.</p></article>
         </div>
         <section class="format-guide" id="formatGuide">
@@ -100,7 +120,7 @@
             <div class="column"><span>необязательно</span><b>Дата</b><small>для графика динамики</small></div>
             <div class="column"><span>необязательно</span><b>Имя</b><small>для списка отзывов</small></div>
           </div>
-          <div class="analysis-tags"><b>Система определит:</b><span>позитив</span><span>нейтрально</span><span>негатив</span><span>сервис</span><span>цена</span><span>качество еды</span><span>атмосфера</span></div>
+          <div class="analysis-tags"><b>Система определит:</b><span>позитив</span><span>нейтрально</span><span>негатив</span><span>сервис</span><span>качество</span><span>цена</span><span>комфорт</span><span>удобство</span><span>надёжность</span></div>
         </section>
 
         <div id="dataDashboard" hidden>
@@ -122,7 +142,7 @@
           </article>
 
           <article class="panel categories-panel">
-            <div class="panel-title"><div><p class="eyebrow">Аспекты</p><h2>Что обсуждают чаще всего</h2></div><span class="chip">4 категории</span></div>
+            <div class="panel-title"><div><p class="eyebrow">Аспекты</p><h2>Что обсуждают чаще всего</h2></div><span class="chip">7 категорий</span></div>
             <div class="category-bars" id="categoryBars"></div>
           </article>
 
@@ -164,15 +184,18 @@
           <div class="score-ring"><strong id="healthScore">0</strong><span>индекс<br>репутации</span></div>
         </div>
         <div class="recommendations" id="recommendations"></div>
-        <div class="method-note"><b>Как это работает в прототипе</b><p>Сайт нормализует CSV, определяет тональность по словарю и рейтингу, затем распределяет текст по аспектам. В следующей версии словарный алгоритм заменяется дообученной моделью ruBERT-tiny2.</p></div>
+        <section class="insight-detail"><div class="section-heading"><p class="eyebrow">Подробный разбор</p><h2>Оценка всех аспектов</h2></div><div class="category-scorecards" id="categoryScorecards"></div></section>
+        <section class="insight-detail"><div class="section-heading"><p class="eyebrow">Основания выводов</p><h2>Что именно пишут клиенты</h2></div><div class="evidence-grid" id="evidenceGrid"></div></section>
+        <section class="insight-detail"><div class="section-heading"><p class="eyebrow">План внедрения</p><h2>Что сделать в ближайшие 30 дней</h2></div><div class="action-plan" id="actionPlan"></div></section>
+        <div class="method-note"><b>Как формируются выводы</b><p>Система учитывает текст, оценку, повторяемость тем и долю негатива. Рекомендации всегда сопровождаются числами и примерами из загруженных отзывов.</p></div>
       </section>
 
       <section class="view" id="aboutView">
         <div class="about-hero"><p class="eyebrow">Школьный проект · Сириус.Лето</p><h2>AI-Customer Insight</h2><p>Интеллектуальный анализатор отзывов для малого бизнеса. Помогает владельцу быстро увидеть повторяющиеся жалобы и сильные стороны без ручного разбора сотен сообщений.</p></div>
         <div class="about-grid">
-          <article><span>01</span><h3>Загрузка</h3><p>Единый CSV из любой площадки. Поддерживаются разные названия колонок и разделители.</p></article>
-          <article><span>02</span><h3>Анализ</h3><p>Тональность: позитив, нейтрально, негатив. Аспекты: сервис, цена, качество еды, атмосфера.</p></article>
-          <article><span>03</span><h3>Решение</h3><p>Владелец получает дашборд, список приоритетных отзывов и практические рекомендации.</p></article>
+          <article><span>01</span><h3>Загрузка</h3><p>Ссылка на Яндекс Карты или CSV из любой площадки. Без ручного копирования каждого отзыва.</p></article>
+          <article><span>02</span><h3>Анализ</h3><p>Тональность и семь аспектов клиентского опыта: от сервиса и качества до удобства и надёжности.</p></article>
+          <article><span>03</span><h3>Решение</h3><p>Владелец получает сильные стороны, зоны роста, подтверждающие отзывы и план действий на 30 дней.</p></article>
         </div>
         <div class="roadmap"><h3>Развитие проекта</h3><div><b>Сейчас</b><span>Функциональный веб-прототип</span></div><div><b>Следующий этап</b><span>ruBERT-tiny2, F1-macro ≥ 0,75</span></div><div><b>Пилот</b><span>Тестирование с 10 владельцами бизнеса</span></div></div>
       </section>
