@@ -10,3 +10,5 @@ ml/data/raw/
 ml/models/*.joblib
 ml/notebooks/.ipynb_checkpoints/
 расхождения.csv
+ml/models/*/
+ml/models/*.zip

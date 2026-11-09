@@ -62,17 +62,30 @@ def train(df):
     }
 
 
+def raw_predict(bundle, texts):
+    """Тональности и флаги категорий {аспект: [0/1, ...]}.
+
+    Работает и с этой моделью (словарь из train), и с любой другой,
+    у которой есть метод raw_predict (например, bert.BertBundle) —
+    поэтому оценка и API общие для всех моделей.
+    """
+    if hasattr(bundle, "raw_predict"):
+        return bundle.raw_predict(texts)
+    sentiments = [str(s) for s in bundle["sentiment"].predict(texts)]
+    flags = {a: [int(f) for f in bundle["aspects"][a].predict(texts)] for a in ASPECTS}
+    return sentiments, flags
+
+
 def predict(bundle, texts):
     """Возвращает для каждого текста тональность и список категорий (как на сайте)."""
     texts = list(texts)
     if not texts:
         return []
-    sentiments = bundle["sentiment"].predict(texts)
-    flags = {a: bundle["aspects"][a].predict(texts) for a in ASPECTS}
+    sentiments, flags = raw_predict(bundle, texts)
     result = []
     for i, sentiment in enumerate(sentiments):
         categories = [ASPECT_NAMES[a] for a in ASPECTS if flags[a][i] == 1]
-        result.append({"sentiment": str(sentiment), "categories": categories or [OTHER_NAME]})
+        result.append({"sentiment": sentiment, "categories": categories or [OTHER_NAME]})
     return result
 
 
@@ -80,10 +93,10 @@ def evaluate(bundle, df):
     """F1-macro по тональности и по категориям + подробные отчёты."""
     texts = df["text"].tolist()
     true_sent = df["sentiment"].tolist()
-    pred_sent = bundle["sentiment"].predict(texts)
+    pred_sent, flags = raw_predict(bundle, texts)
 
     true_cat = [mentioned(df, a) for a in ASPECTS]
-    pred_cat = [bundle["aspects"][a].predict(texts).tolist() for a in ASPECTS]
+    pred_cat = [flags[a] for a in ASPECTS]
     per_aspect = {
         a: f1_score(t, p, zero_division=0) for a, t, p in zip(ASPECTS, true_cat, pred_cat)
     }

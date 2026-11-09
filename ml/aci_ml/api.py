@@ -3,6 +3,9 @@
 Запуск из папки ml/ (после обучения модели):
     uvicorn aci_ml.api:app --port 8000
 
+По умолчанию берётся models/baseline.joblib. Чтобы отвечал rubert-tiny2,
+укажите папку с ним в переменной окружения ACI_MODEL=models/rubert_tiny2.
+
 Проверка: http://127.0.0.1:8000/docs — там можно отправить запрос из браузера.
 
 Отзывы не сохраняются: модель отвечает и забывает текст.
@@ -38,7 +41,11 @@ def get_model():
     if _model is None:
         if not MODEL_PATH.exists():
             raise HTTPException(503, "Модель не обучена: запустите python -m aci_ml.baseline")
-        _model = baseline.load(MODEL_PATH)
+        if MODEL_PATH.is_dir():  # папка — это сохранённый rubert-tiny2
+            from . import bert  # torch нужен только для этой модели
+            _model = bert.load(MODEL_PATH)
+        else:
+            _model = baseline.load(MODEL_PATH)
     return _model
 
 
@@ -69,4 +76,4 @@ def health():
 def analyze(request: AnalyzeRequest):
     model = get_model()
     results = baseline.predict(model, (r.text for r in request.reviews))
-    return {"model": "tfidf-logreg", "results": results}
+    return {"model": getattr(model, "name", "tfidf-logreg"), "results": results}

@@ -6,7 +6,7 @@
 |---|---|---|
 | 0 — словарь | `dist/analyzer.js` | работает на сайте |
 | 1 — TF-IDF + логистическая регрессия | `aci_ml/baseline.py`, `notebooks/01_baseline.ipynb` | каркас готов, нужны данные |
-| 2 — rubert-tiny2 | Colab / Kaggle (GPU) | следующий шаг |
+| 2 — rubert-tiny2 | `aci_ml/bert.py`, `notebooks/02_rubert_tiny2.ipynb` (Colab, GPU) | каркас готов, нужны данные |
 
 Цели из установочного отчёта: F1-macro ≥ 0.80 по тональности, ≥ 0.75 по категориям, 1000 отзывов меньше чем за минуту.
 
@@ -18,9 +18,11 @@
 | `aci_ml/semeval.py` | чтение корпуса SemEval-2016 (русские рестораны) |
 | `aci_ml/dataset.py` | чтение и проверка своей разметки (CSV) |
 | `aci_ml/baseline.py` | обучение, оценка F1, сохранение модели |
+| `aci_ml/bert.py` | дообучение rubert-tiny2, сохранение и загрузка |
 | `aci_ml/agreement.py` | согласие двух разметчиков на пилоте |
 | `aci_ml/api.py` | API для сайта: `POST /api/analyze` |
-| `notebooks/01_baseline.ipynb` | то же обучение пошагово, с разбором ошибок |
+| `notebooks/01_baseline.ipynb` | модель 1 пошагово, с разбором ошибок |
+| `notebooks/02_rubert_tiny2.ipynb` | модель 2 и таблица сравнения с моделью 1 |
 | `РАЗМЕТКА.md` | инструкция для разметчиков |
 | `data/` | шаблон разметки и описание, где взять корпус |
 | `tests/` | тесты (`pytest`) |
@@ -62,11 +64,15 @@ pytest
    python -m aci_ml.baseline --train data/raw/train.xml data/наша_разметка.csv --test data/raw/test.xml
    ```
    Программа печатает F1 по тональности и категориям, сравнивает с целями из отчёта и сохраняет модель в `models/baseline.joblib`.
-4. **API:**
+4. **Нейросеть.** Открыть `notebooks/02_rubert_tiny2.ipynb` в Google Colab (Файл → Загрузить блокнот), включить T4 GPU и выполнить все ячейки. В конце — таблица сравнения двух моделей на одном тесте и сохранённая модель (архив скачается на компьютер). Локально для этого нужны дополнительные библиотеки:
+   ```bash
+   pip install -r requirements-bert.txt
+   ```
+5. **API:**
    ```bash
    uvicorn aci_ml.api:app --port 8000
    ```
-   Страница для проверки запросов: http://127.0.0.1:8000/docs
+   Страница для проверки запросов: http://127.0.0.1:8000/docs. По умолчанию отвечает модель 1; чтобы отвечал rubert-tiny2, распакуйте модель в `models/rubert_tiny2/` и задайте переменную окружения `ACI_MODEL=models/rubert_tiny2`.
 
 ## Единый формат
 
