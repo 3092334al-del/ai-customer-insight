@@ -1,0 +1,6 @@
+﻿text;sentiment;service;food;price;atmosphere;source
+Пицца отличная, но ждали официанта 40 минут;both;negative;positive;;;пример
+Дорого, но оно того стоит. Очень уютный зал;positive;;;positive;positive;пример
+Официант принёс холодный суп;negative;;negative;;;пример
+Заказали пиццу и чай;neutral;;neutral;;;пример
+Придём ещё, рекомендую;positive;;;;;пример
