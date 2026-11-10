@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="empty-state.css">
   <link rel="stylesheet" href="readability.css">
-  <link rel="stylesheet" href="product.css?v=2">
+  <link rel="stylesheet" href="product.css?v=3">
 </head>
 <body>
   <div class="app-shell">
@@ -27,13 +27,13 @@
 
       <div class="product-status">
         <span></span>
-        <div><b>Учебный прототип</b><small>Файл не покидает браузер</small></div>
+        <div><b>Учебный прототип</b><small>Файл не покидает браузер</small><a class="legal-link" href="legal.html">Правовая информация</a></div>
       </div>
     </aside>
 
     <main class="main">
       <header class="topbar">
-        <button class="mobile-menu" id="mobileMenu" aria-label="Открыть меню">☰</button>
+        <button class="mobile-menu" id="mobileMenu" aria-label="Меню" aria-expanded="false">☰</button>
         <div>
           <p class="eyebrow">Панель владельца</p>
           <h1 id="pageTitle">Обзор отзывов</h1>
@@ -107,10 +107,10 @@
         <div id="dataDashboard" hidden>
 
         <div class="kpi-grid">
-          <article class="kpi"><div class="kpi-head"><span>Всего отзывов</span><i class="cyan">☷</i></div><strong id="totalReviews">0</strong><small id="periodLabel">данные не загружены</small></article>
-          <article class="kpi"><div class="kpi-head"><span>Средняя оценка</span><i class="amber">★</i></div><strong id="avgRating">—</strong><small><b class="good" id="ratingDelta">нет данных</b></small></article>
-          <article class="kpi"><div class="kpi-head"><span>Позитивные</span><i class="green">↗</i></div><strong id="positiveShare">0%</strong><small><b class="good" id="positiveCount">0 отзывов</b></small></article>
-          <article class="kpi"><div class="kpi-head"><span>Требуют внимания</span><i class="coral">!</i></div><strong id="negativeCount">0</strong><small><b class="bad" id="negativeShare">0% выборки</b></small></article>
+          <article class="kpi"><div class="kpi-head"><span>Всего отзывов</span><i class="cyan" aria-hidden="true">☷</i></div><strong id="totalReviews">0</strong><small id="periodLabel">данные не загружены</small></article>
+          <article class="kpi"><div class="kpi-head"><span>Средняя оценка</span><i class="amber" aria-hidden="true">★</i></div><strong id="avgRating">—</strong><small><b class="good" id="ratingDelta">нет данных</b></small></article>
+          <article class="kpi"><div class="kpi-head"><span>Позитивные</span><i class="green" aria-hidden="true">↗</i></div><strong id="positiveShare">0%</strong><small><b class="good" id="positiveCount">0 отзывов</b></small></article>
+          <article class="kpi"><div class="kpi-head"><span>Требуют внимания</span><i class="coral" aria-hidden="true">!</i></div><strong id="negativeCount">0</strong><small><b class="bad" id="negativeShare">0% выборки</b></small></article>
         </div>
 
         <div class="dashboard-grid">
@@ -183,11 +183,12 @@
           <div><b>Ваши данные</b><span>Файл обрабатывается только в вашем браузере: он не передаётся на сервер и не сохраняется, после закрытия вкладки данные исчезают. Cookie и сторонние счётчики не используются.</span></div>
           <div><b>Личные данные</b><span>Имена авторов из файла не читаются и не показываются. Если в текстах отзывов есть телефоны или другие личные данные, удалите их перед загрузкой.</span></div>
           <div><b>Точность</b><span>Словарная модель ошибается на иронии, сложных отрицаниях и смешанных отзывах. Используйте выводы как подсказку, а не как окончательное заключение.</span></div>
+          <div><b>Подробнее</b><span><a href="legal.html">Условия использования, конфиденциальность и контакты</a></span></div>
         </div>
       </section>
     </main>
   </div>
   <div class="toast" id="toast" role="status"></div>
-  <script type="module" src="app.js?v=3"></script>
+  <script type="module" src="app.js?v=4"></script>
 </body>
 </html>

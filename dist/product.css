@@ -10,3 +10,23 @@
 @media(max-width:700px){.source-hero{padding:26px 20px;border-radius:18px}.source-copy h2{font-size:28px}.yandex-form{padding:16px}.url-control{grid-template-columns:40px 1fr}.url-control .button{grid-column:1/-1;width:calc(100% - 8px);margin:4px}.company-facts{flex-wrap:wrap}.category-scorecards,.evidence-grid{grid-template-columns:1fr}.source-divider span{text-align:center}.company-banner{padding:20px}}
 .format-guide .note{grid-column:1/-1;margin:0;color:#b9d3d5;font-size:12px}
 .data-note{background:#f1f5f6}
+
+/* Доступность: контраст текста не ниже 4.5:1 (WCAG 2.1 AA) и заметный фокус для клавиатуры */
+:root{--muted:#5d6874}
+.button.primary{background:var(--teal-dark)}
+.kpi small,.review-cell span,th,.chart-axis,.evidence-quote b,.chip{color:#5d6874}
+.good{color:#2f7046}.bad{color:#a8473b}
+.sentiment-tag.positive{color:#2a6640}.sentiment-tag.negative{color:#9c4236}.sentiment-tag.neutral{color:#7a4f0e}
+.priority{color:#9c4236!important;font-size:11px!important}
+.stars{color:#96600a}
+:focus-visible{outline:3px solid var(--teal-dark);outline-offset:2px}
+.sidebar :focus-visible,.insight-panel :focus-visible,.recommendation-hero :focus-visible{outline-color:#7fd2ca}
+.search:focus-within{outline:3px solid var(--teal-dark);outline-offset:2px}
+.legal-link{display:block;margin-top:14px;color:#a9c1c3;font-size:13px}
+.legal-link:hover{color:#fff}
+@media(max-width:760px){.sidebar{transition:left .25s,visibility .25s}.sidebar:not(.open){visibility:hidden}}
+.data-note a{color:var(--teal-dark);font-weight:700}
+.rec-card>span,.rec-card>span.priority{font-size:11px!important}
+.rec-card>span:not(.priority){color:#0a5f5c}
+.score-card p{color:#5d6874}
+.about-grid span,.empty-benefits span{color:var(--teal-dark)}

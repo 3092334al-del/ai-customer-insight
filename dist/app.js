@@ -18,6 +18,7 @@ const plural = (n, one, few, many) => {
 };
 const formatNumber = n => new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 1 }).format(n);
 const stars = rating => rating ? '★'.repeat(rating) + '☆'.repeat(5 - rating) : 'без оценки';
+const starsHtml = (rating, tag = "span") => `<${tag} class="stars" ${rating ? `role="img" aria-label="Оценка ${rating} из 5"` : ""}>${stars(rating)}</${tag}>`;
 const average = items => items.length ? items.reduce((sum, r) => sum + r.rating, 0) / items.length : 0;
 
 // ---------- данные ----------
@@ -134,7 +135,7 @@ function renderTimeline() {
 function renderComplaints() {
   const bad = analysis.filter(r => r.sentiment === 'negative').sort((a, b) => a.score - b.score || a.rating - b.rating).slice(0, 4);
   $('#complaintsBody').innerHTML = bad.length
-    ? bad.map(r => `<tr><td class="review-cell"><b>${escapeHtml(r.text)}</b><span>${escapeHtml(r.date)}</span></td><td><span class="tag">${escapeHtml(r.categories[0])}</span></td><td><span class="stars">${stars(r.rating)}</span></td><td><span class="sentiment-tag negative">Негатив</span></td></tr>`).join('')
+    ? bad.map(r => `<tr><td class="review-cell"><b>${escapeHtml(r.text)}</b><span>${escapeHtml(r.date)}</span></td><td><span class="tag">${escapeHtml(r.categories[0])}</span></td><td>${starsHtml(r.rating)}</td><td><span class="sentiment-tag negative">Негатив</span></td></tr>`).join('')
     : '<tr><td colspan="4" class="empty">Негативных отзывов не найдено</td></tr>';
 }
 
@@ -143,7 +144,7 @@ function renderReviews() {
   const filter = $('#sentimentFilter')?.value || 'all';
   const list = analysis.filter(r => (filter === 'all' || r.sentiment === filter) && r.text.toLowerCase().includes(query));
   $('#reviewList').innerHTML = list.length
-    ? list.map(r => `<article class="review-card"><div><div class="review-meta"><span>${escapeHtml(r.date)}</span><span class="sentiment-tag ${r.sentiment}">${SENTIMENT_LABEL[r.sentiment]}</span></div><p class="review-text">${escapeHtml(r.text)}</p><div class="review-tags">${r.categories.map(c => `<span class="tag">${escapeHtml(c)}</span>`).join('')}</div></div><div class="stars">${stars(r.rating)}</div></article>`).join('')
+    ? list.map(r => `<article class="review-card"><div><div class="review-meta"><span>${escapeHtml(r.date)}</span><span class="sentiment-tag ${r.sentiment}">${SENTIMENT_LABEL[r.sentiment]}</span></div><p class="review-text">${escapeHtml(r.text)}</p><div class="review-tags">${r.categories.map(c => `<span class="tag">${escapeHtml(c)}</span>`).join('')}</div></div>${starsHtml(r.rating, "div")}</article>`).join('')
     : '<div class="empty">По выбранным условиям ничего не найдено</div>';
 }
 
@@ -272,6 +273,7 @@ function switchView(name) {
   $(`#${name}View`).classList.add('active');
   $('#pageTitle').textContent = { dashboard: 'Обзор отзывов', reviews: 'Все отзывы', insights: 'Рекомендации', about: 'О проекте' }[name];
   $('.sidebar').classList.remove('open');
+  $('#mobileMenu').setAttribute('aria-expanded', 'false');
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -286,7 +288,10 @@ function showToast(text) {
 
 $$('.nav-item').forEach(b => b.addEventListener('click', () => switchView(b.dataset.view)));
 $$('[data-go]').forEach(b => b.addEventListener('click', () => switchView(b.dataset.go)));
-$('#mobileMenu').addEventListener('click', () => $('.sidebar').classList.toggle('open'));
+$('#mobileMenu').addEventListener('click', () => {
+  const open = $('.sidebar').classList.toggle('open');
+  $('#mobileMenu').setAttribute('aria-expanded', String(open));
+});
 $('#uploadBtn').addEventListener('click', () => $('#fileInput').click());
 $('#emptyUploadBtn').addEventListener('click', () => $('#fileInput').click());
 $('#fileInput').addEventListener('change', e => handleFile(e.target.files[0]));
