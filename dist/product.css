@@ -30,3 +30,24 @@
 .rec-card>span:not(.priority){color:#0a5f5c}
 .score-card p{color:#5d6874}
 .about-grid span,.empty-benefits span{color:var(--teal-dark)}
+
+/* Импорт из Яндекс Карт (вёрстка команды, контраст доведён до 4.5:1) */
+.source-hero{position:relative;overflow:hidden;display:grid;grid-template-columns:minmax(250px,.8fr) minmax(410px,1.2fr);gap:42px;align-items:center;padding:38px 42px;margin-bottom:22px;border-radius:24px;background:linear-gradient(120deg,#112b43 0%,#163c55 58%,#156070 100%);color:#fff;box-shadow:0 18px 42px rgba(17,43,67,.14)}
+.source-hero:after{content:"";position:absolute;width:260px;height:260px;border-radius:50%;right:-100px;top:-150px;background:rgba(57,210,200,.13)}
+.source-copy{position:relative;z-index:1}.source-copy h2{max-width:540px;margin:7px 0 12px;font-size:clamp(27px,3vw,40px);line-height:1.08;letter-spacing:-.035em}.source-copy p:last-child{max-width:520px;margin:0;color:#c8dbe5;font-size:16px;line-height:1.55}.source-hero .eyebrow{color:#65ded5}
+.yandex-form{position:relative;z-index:1;padding:22px;border-radius:18px;background:#fff;color:#173044;box-shadow:0 12px 36px rgba(0,0,0,.14)}.yandex-form label{display:block;margin-bottom:9px;font-size:14px;font-weight:750}
+.url-control{display:grid;grid-template-columns:42px 1fr auto;align-items:center;overflow:hidden;border:1px solid #9fb2bb;border-radius:13px;background:#f8fbfc}.url-control:focus-within{outline:3px solid var(--teal-dark);outline-offset:2px}
+.url-control>span{display:grid;place-items:center;width:34px;height:34px;margin-left:6px;border-radius:9px;background:#d52b30;color:#fff;font-weight:850}
+.url-control input{min-width:0;padding:14px 10px;border:0;outline:0;background:transparent;font:inherit;color:#173044}.url-control .button{height:46px;margin-right:4px;white-space:nowrap}.url-control .button:disabled{opacity:.7;cursor:progress}
+.import-feedback{min-height:18px;margin-top:9px;color:#5d6874;font-size:12px;line-height:1.45}.import-feedback.error{color:#a8473b}.import-feedback.success{color:#0a6b62}
+.source-divider{display:flex;align-items:center;gap:16px;margin:4px 0 18px;color:#5d6874;font-size:12px;text-transform:uppercase;letter-spacing:.08em}.source-divider:before,.source-divider:after{content:"";height:1px;flex:1;background:#dfe7eb}
+.company-banner{display:flex;justify-content:space-between;gap:30px;align-items:center;margin:0 0 18px;padding:23px 27px;border:1px solid #d8e6e8;border-radius:19px;background:linear-gradient(100deg,#f3fbfb,#f7fafc)}.company-banner[hidden]{display:none}
+.company-banner small{color:#0d7774;font-weight:800;letter-spacing:.08em}.company-banner h2{margin:5px 0 3px;font-size:25px}.company-banner p{margin:0;color:#5d6874}
+.company-facts{display:flex;align-items:center;gap:22px}.company-facts span{color:#5d6874;font-size:12px}.company-facts b{display:block;color:#173044;font-size:21px}.company-facts a{color:#0d7774;font-weight:750;text-decoration:none;white-space:nowrap}.company-facts a:hover{text-decoration:underline}
+@media(max-width:1050px){.source-hero{grid-template-columns:1fr;gap:22px;padding:28px}}
+@media(max-width:600px){.source-hero{padding:22px 16px}.yandex-form{padding:16px}.url-control{grid-template-columns:38px 1fr}.url-control .button{grid-column:1/-1;margin:0 4px 4px}.company-banner{display:block;padding:20px}.company-facts{margin-top:14px;flex-wrap:wrap}}
+
+/* Индекс репутации: кольцо заполняется на значение индекса */
+.score-ring{position:relative;border:0;background:conic-gradient(#4fd1c5 calc(var(--score,0)*1%),#2b5559 0)}
+.score-ring:before{content:"";position:absolute;inset:10px;border-radius:50%;background:#123438}
+.score-ring>*{position:relative}.score-ring span{color:#c4dadb}

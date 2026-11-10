@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="empty-state.css">
   <link rel="stylesheet" href="readability.css">
-  <link rel="stylesheet" href="product.css?v=3">
+  <link rel="stylesheet" href="product.css?v=4">
 </head>
 <body>
   <div class="app-shell">
@@ -44,6 +44,20 @@
       </header>
 
       <section class="view active" id="dashboardView">
+        <section class="source-hero">
+          <div class="source-copy">
+            <p class="eyebrow">Быстрый анализ компании</p>
+            <h2>Вставьте ссылку на компанию в Яндекс Картах</h2>
+            <p>Сервис загрузит последние публичные отзывы (до 50), найдёт сильные и слабые стороны и составит план улучшений.</p>
+          </div>
+          <form class="yandex-form" id="yandexForm" novalidate>
+            <label for="yandexUrl">Ссылка на карточку компании</label>
+            <div class="url-control"><span aria-hidden="true">Я</span><input id="yandexUrl" type="url" required inputmode="url" autocomplete="url" placeholder="https://yandex.ru/maps/org/..." aria-describedby="importFeedback"><button class="button primary" id="yandexBtn" type="submit">Проанализировать</button></div>
+            <div class="import-feedback" id="importFeedback" role="status">Подойдёт обычная или короткая ссылка. Ссылка отправляется на наш сервер, отзывы не сохраняются, имена авторов не загружаются.</div>
+          </form>
+        </section>
+
+        <div class="source-divider"><span>или загрузите собственную выгрузку</span></div>
         <div class="upload-card" id="dropZone">
           <div class="upload-copy">
             <span class="upload-icon" aria-hidden="true">↥</span>
@@ -78,7 +92,7 @@
             <div class="preview-head"><div><small>ПРЕДПРОСМОТР</small><b>Что появится после анализа</b></div><span>ПРИМЕР</span></div>
             <div class="preview-kpis"><div><small>Тональность</small><strong>3 класса</strong></div><div><small>Категории</small><strong>4 + прочее</strong></div></div>
             <div class="preview-chart">
-              <div class="preview-donut"><span>%</span></div>
+              <div class="preview-donut"><span>AI</span></div>
               <div class="preview-bars"><p><span>Сервис</span><i style="--w:86%"></i></p><p><span>Качество еды</span><i style="--w:72%"></i></p><p><span>Цена</span><i style="--w:48%"></i></p><p><span>Атмосфера</span><i style="--w:63%"></i></p></div>
             </div>
             <div class="preview-signal"><span>✦</span><div><small>Главный результат</small><b>Сильные стороны и проблемные сигналы — на одном экране</b></div></div>
@@ -105,6 +119,15 @@
         </section>
 
         <div id="dataDashboard" hidden>
+
+        <section class="company-banner" id="companyBanner" hidden>
+          <div><small>ЯНДЕКС КАРТЫ</small><h2 id="companyName"></h2><p id="companyAddress"></p></div>
+          <div class="company-facts">
+            <span><b id="companyRating">—</b>рейтинг</span>
+            <span><b id="companyReviews">—</b>отзывов всего</span>
+            <a id="companyLink" href="#" target="_blank" rel="noopener">Открыть карточку ↗</a>
+          </div>
+        </section>
 
         <div class="kpi-grid">
           <article class="kpi"><div class="kpi-head"><span>Всего отзывов</span><i class="cyan" aria-hidden="true">☷</i></div><strong id="totalReviews">0</strong><small id="periodLabel">данные не загружены</small></article>
@@ -161,7 +184,8 @@
 
       <section class="view" id="insightsView">
         <div class="recommendation-hero">
-          <div><p class="eyebrow">Рекомендации</p><h2>Из отзывов — в понятный план действий</h2><p>Первой идёт категория, в которой больше всего негативных отзывов.</p></div>
+          <div><p class="eyebrow">AI-рекомендации</p><h2>Из отзывов — в понятный план действий</h2><p>Первой идёт категория, в которой больше всего негативных отзывов. Индекс репутации: 70 % — доля позитивных отзывов, 30 % — средняя оценка по пятибалльной шкале.</p></div>
+          <div class="score-ring" id="scoreRing" role="img" aria-label="Индекс репутации: нет данных"><strong id="healthScore">—</strong><span>индекс<br>репутации</span></div>
         </div>
         <div class="recommendations" id="recommendations"></div>
         <section class="insight-detail"><div class="section-heading"><p class="eyebrow">Подробный разбор</p><h2>Оценка всех аспектов</h2></div><div class="category-scorecards" id="categoryScorecards"></div></section>
@@ -180,7 +204,7 @@
         <div class="roadmap"><h3>Развитие проекта</h3><div><b>Сейчас</b><span>Веб-прототип со словарной моделью</span></div><div><b>Следующий этап</b><span>Модели TF-IDF и rubert-tiny2 на размеченных отзывах, цель — F1-macro не ниже 0,75</span></div><div><b>Пилот</b><span>Опрос и тестирование с владельцами малого бизнеса (цель — не менее 10)</span></div></div>
         <div class="roadmap data-note"><h3>О данных и ограничениях</h3>
           <div><b>Что это</b><span>Учебный проект команды школьников программы «Сириус.Лето», партнёр проекта — СПбГЭУ. Это не коммерческий сервис.</span></div>
-          <div><b>Ваши данные</b><span>Файл обрабатывается только в вашем браузере: он не передаётся на сервер и не сохраняется, после закрытия вкладки данные исчезают. Cookie и сторонние счётчики не используются.</span></div>
+          <div><b>Ваши данные</b><span>CSV-файл обрабатывается только в вашем браузере: он не передаётся на сервер и не сохраняется. При импорте из Яндекс Карт ссылка отправляется на наш сервер, он загружает публичную страницу карточки и возвращает дату, оценку и текст отзывов; ничего не сохраняется. Cookie и сторонние счётчики не используются.</span></div>
           <div><b>Личные данные</b><span>Имена авторов из файла не читаются и не показываются. Если в текстах отзывов есть телефоны или другие личные данные, удалите их перед загрузкой.</span></div>
           <div><b>Точность</b><span>Словарная модель ошибается на иронии, сложных отрицаниях и смешанных отзывах. Используйте выводы как подсказку, а не как окончательное заключение.</span></div>
           <div><b>Подробнее</b><span><a href="legal.html">Условия использования, конфиденциальность и контакты</a></span></div>
@@ -189,6 +213,6 @@
     </main>
   </div>
   <div class="toast" id="toast" role="status"></div>
-  <script type="module" src="app.js?v=4"></script>
+  <script type="module" src="app.js?v=5"></script>
 </body>
 </html>

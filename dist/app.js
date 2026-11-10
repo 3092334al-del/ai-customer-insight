@@ -1,5 +1,10 @@
 import { CATEGORIES, OTHER, classify, mentions } from './analyzer.js';
 import { decodeCsv, parseCSV, parseDate } from './csv.js';
+import { reputationIndex, reputationLevel } from './metrics.js';
+
+// Адрес API импорта. На GitHub Pages сервера нет, поэтому в index.html
+// (<meta name="aci-import-api">) указан адрес функции на Vercel.
+const IMPORT_API = document.querySelector('meta[name="aci-import-api"]')?.content || 'api/import/yandex';
 
 const ALL_CATEGORIES = [...CATEGORIES, OTHER];
 const SENTIMENT_LABEL = { positive: 'Позитив', neutral: 'Нейтрально', negative: 'Негатив' };
@@ -49,6 +54,27 @@ function renderEmptyState() {
   $('#categoryScorecards').innerHTML = '';
   $('#evidenceGrid').innerHTML = '';
   $('#actionPlan').innerHTML = '';
+  $('#companyBanner').hidden = true;
+  renderReputation();
+}
+
+function renderReputation() {
+  const index = reputationIndex(analysis);
+  const ring = $('#scoreRing');
+  $('#healthScore').textContent = index === null ? '—' : index;
+  ring.style.setProperty('--score', index ?? 0);
+  ring.setAttribute('aria-label', index === null
+    ? 'Индекс репутации: нет данных'
+    : `Индекс репутации: ${index} из 100, ${reputationLevel(index)}`);
+}
+
+function showCompany(company) {
+  $('#companyName').textContent = company.name;
+  $('#companyAddress').textContent = company.address || '';
+  $('#companyRating').textContent = company.rating ? formatNumber(company.rating) : '—';
+  $('#companyReviews').textContent = company.reviewCount ? new Intl.NumberFormat('ru-RU').format(company.reviewCount) : '—';
+  $('#companyLink').href = company.url;
+  $('#companyBanner').hidden = false;
 }
 
 // ---------- обзор ----------
@@ -87,6 +113,7 @@ function renderAll(label) {
   renderReviews();
   renderRecommendations();
   renderInsight();
+  renderReputation();
 }
 
 function categoryStats() {
@@ -256,12 +283,56 @@ async function handleFile(file) {
     const { text, encoding } = decodeCsv(await file.arrayBuffer());
     const rows = parseCSV(text);
     setData(rows, file.name);
+    $('#companyBanner').hidden = true;
     const note = encoding === 'UTF-8' ? '' : ` (кодировка ${encoding})`;
     $('#fileFeedback').textContent = `✓ ${file.name}: проанализировано ${rows.length} ${plural(rows.length, 'отзыв', 'отзыва', 'отзывов')}${note}`;
     showToast('Анализ завершён');
   } catch (e) {
     showToast(e.message);
     $('#fileFeedback').textContent = 'Не удалось прочитать файл. Проверьте заголовки колонок.';
+  }
+}
+
+// ---------- импорт из Яндекс Карт ----------
+
+async function importYandex(event) {
+  event.preventDefault();
+  const input = $('#yandexUrl');
+  const button = $('#yandexBtn');
+  const feedback = $('#importFeedback');
+  const url = input.value.trim();
+  if (!url) {
+    feedback.className = 'import-feedback error';
+    feedback.textContent = 'Вставьте ссылку на карточку компании.';
+    return input.focus();
+  }
+  button.disabled = true;
+  button.textContent = 'Загружаем…';
+  feedback.className = 'import-feedback';
+  feedback.textContent = 'Загружаем отзывы из Яндекс Карт, это занимает несколько секунд…';
+  try {
+    const response = await fetch(IMPORT_API, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ url }),
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(data.error || `Сервер ответил ошибкой ${response.status}`);
+    setData(data.reviews, `Яндекс Карты · ${data.company.name}`);
+    showCompany(data.company);
+    const n = data.reviews.length;
+    feedback.className = 'import-feedback success';
+    feedback.textContent = `✓ ${data.company.name}: проанализировано ${n} ${plural(n, 'последний отзыв', 'последних отзыва', 'последних отзывов')}`;
+    $('#fileFeedback').textContent = '';
+    showToast('Анализ завершён');
+  } catch (error) {
+    feedback.className = 'import-feedback error';
+    feedback.textContent = error instanceof TypeError
+      ? 'Сервер импорта недоступен. Попробуйте позже или загрузите CSV.'
+      : error.message;
+  } finally {
+    button.disabled = false;
+    button.textContent = 'Проанализировать';
   }
 }
 
@@ -297,6 +368,7 @@ $('#emptyUploadBtn').addEventListener('click', () => $('#fileInput').click());
 $('#fileInput').addEventListener('change', e => handleFile(e.target.files[0]));
 $('#reviewSearch').addEventListener('input', renderReviews);
 $('#sentimentFilter').addEventListener('change', renderReviews);
+$('#yandexForm').addEventListener('submit', importYandex);
 
 const dropZone = $('#dropZone');
 ['dragenter', 'dragover'].forEach(type => dropZone.addEventListener(type, e => { e.preventDefault(); dropZone.classList.add('dragging'); }));

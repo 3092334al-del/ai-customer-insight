@@ -1,0 +1,9 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "outputDirectory": "dist",
+  "regions": ["fra1"],
+  "functions": {
+    "api/import/yandex.js": { "maxDuration": 30 }
+  }
+}

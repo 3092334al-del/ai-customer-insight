@@ -1,9 +1,10 @@
-// Локальный сервер для разработки: отдаёт файлы из dist/.
-// Анализ выполняется в браузере, поэтому серверного API нет.
+// Локальный сервер для разработки: отдаёт файлы из dist/ и API импорта из Яндекс Карт.
+// Анализ отзывов выполняется в браузере.
 import http from 'node:http';
 import { readFile, stat } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { handleImport } from './lib/import-api.js';
 
 const root = path.dirname(fileURLToPath(import.meta.url));
 const publicDir = path.join(root, 'dist');
@@ -46,10 +47,38 @@ async function serveStatic(req, res) {
   }
 }
 
-export function createServer() {
+async function readJson(req) {
+  let size = 0;
+  const chunks = [];
+  for await (const chunk of req) {
+    size += chunk.length;
+    if (size > 16_384) return null;
+    chunks.push(chunk);
+  }
+  try {
+    return JSON.parse(Buffer.concat(chunks).toString('utf8') || '{}');
+  } catch {
+    return null;
+  }
+}
+
+export function createServer({ fetchImpl } = {}) {
   return http.createServer(async (req, res) => {
     try {
       if (req.method === 'GET' && req.url === '/health') return sendJson(res, 200, { ok: true });
+      if (new URL(req.url, 'http://localhost').pathname === '/api/import/yandex') {
+        const body = req.method === 'POST' ? await readJson(req) : null;
+        const result = await handleImport({
+          method: req.method, origin: req.headers.origin, ip: req.socket.remoteAddress, body, fetchImpl,
+        });
+        if (result.body === null) {
+          res.writeHead(result.status, result.headers);
+          return res.end();
+        }
+        const json = JSON.stringify(result.body);
+        res.writeHead(result.status, { ...result.headers, 'content-type': 'application/json; charset=utf-8' });
+        return res.end(json);
+      }
       if (req.method === 'GET' || req.method === 'HEAD') return await serveStatic(req, res);
       sendJson(res, 405, { error: 'Метод не поддерживается' });
     } catch (error) {
