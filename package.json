@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "Анализ отзывов компании по ссылке Яндекс Карт или CSV",
+  "description": "Анализ тональности и категорий отзывов малого бизнеса из CSV",
   "scripts": {
     "start": "node server.js",
     "test": "node --test"

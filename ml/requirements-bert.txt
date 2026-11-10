@@ -1,0 +1,5 @@
+# Для модели 2 (rubert-tiny2). В Colab torch уже установлен.
+-r requirements.txt
+torch>=2.4
+transformers>=4.44
+matplotlib>=3.8
