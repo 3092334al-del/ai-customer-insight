@@ -13,7 +13,7 @@
         <text>Стейк пережарен, а вино кислое.</text>
         <Opinions>
           <Opinion target="Стейк" category="FOOD#QUALITY" polarity="negative" from="0" to="5"/>
-          <Opinion target="вино" category="DRINKS#QUALITY" polarity="negative" from="18" to="22"/>
+          <Opinion target="вино" category="DRINK#QUALITY" polarity="negative" from="18" to="22"/>
         </Opinions>
       </sentence>
       <sentence id="1:2">

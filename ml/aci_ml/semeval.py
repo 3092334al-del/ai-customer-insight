@@ -15,7 +15,7 @@
           ...
 
 Категории SemEval (СУЩНОСТЬ#АТРИБУТ) сводятся к нашим четырём:
-любые *#PRICES → цена; FOOD и DRINKS → качество еды; SERVICE → сервис;
+любые *#PRICES → цена; FOOD и DRINK → качество еды; SERVICE → сервис;
 AMBIENCE → атмосфера. RESTAURANT#GENERAL, RESTAURANT#MISCELLANEOUS и
 LOCATION#GENERAL ни в одну категорию не попадают, но учитываются
 в общей тональности.
@@ -35,7 +35,8 @@ def map_category(category):
         return "price"
     return {
         "FOOD": "food",
-        "DRINKS": "food",
+        "DRINK": "food",   # так в русских данных SemEval-2016
+        "DRINKS": "food",  # так в английских
         "SERVICE": "service",
         "AMBIENCE": "atmosphere",
     }.get(entity)

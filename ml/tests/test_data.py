@@ -14,6 +14,8 @@ SAMPLE = Path(__file__).parent / "fixtures" / "semeval_ru_sample.xml"
 def test_map_category():
     assert map_category("FOOD#QUALITY") == "food"
     assert map_category("DRINKS#STYLE_OPTIONS") == "food"
+    assert map_category("DRINK#QUALITY") == "food", "в русских данных DRINK, а не DRINKS"
+    assert map_category("FOOD#GENERAL") == "food"
     assert map_category("FOOD#PRICES") == "price"
     assert map_category("RESTAURANT#PRICES") == "price"
     assert map_category("SERVICE#GENERAL") == "service"
